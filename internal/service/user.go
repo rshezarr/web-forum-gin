@@ -23,7 +23,12 @@ func NewUser(repo repository.User) *UserService {
 }
 
 func (s *UserService) CreateUser(user model.User) (int, error) {
-	panic("not implemented") // TODO: Implement
+	id, err := s.repo.CreateUser(user)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 func (s *UserService) GenerateToken(username string, password string) (model.User, error) {
