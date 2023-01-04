@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"forum/internal/model"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
@@ -14,7 +13,6 @@ type User interface {
 	CreateUser(user model.User) (int, error)
 	GetUserByID(userID int) (model.User, error)
 	GetUser(email, hashedPassword string) (model.User, error)
-	SaveToken(username, token string, expirationTime time.Time) error
 	GetUserByToken(token string) (model.User, error)
 	DeleteToken(token string) error
 }
@@ -80,10 +78,6 @@ func (r *UserRepository) GetUser(email, hashedPassword string) (model.User, erro
 	}
 
 	return user, nil
-}
-
-func (r *UserRepository) SaveToken(username string, token string, expirationTime time.Time) error {
-	panic("not implemented") // TODO: Implement
 }
 
 func (r *UserRepository) GetUserByToken(token string) (model.User, error) {
