@@ -48,7 +48,20 @@ func (r *UserRepository) CreateUser(user model.User) (int, error) {
 }
 
 func (r *UserRepository) GetUser(userID int) (model.User, error) {
-	panic("not implemented") // TODO: Implement
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
+	defer cancel()
+
+	stmt, err := r.db.Preparex(`SELECT id, email, username, password FROM users WHERE id = $1;`)
+	if err != nil {
+		return model.User{}, fmt.Errorf("repo: get user: prepare - %w", err)
+	}
+
+	var user model.User
+	if err := stmt.GetContext(ctx, &user, userID); err != nil {
+		return model.User{}, fmt.Errorf("repo: ger user: get - %w", err)
+	}
+
+	return user, nil
 }
 
 func (r *UserRepository) SaveToken(username string, token string, expirationTime time.Time) error {
