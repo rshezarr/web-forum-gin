@@ -59,7 +59,7 @@ func (s *UserService) GenerateToken(email string, password string) (string, erro
 		return "", fmt.Errorf("service: generate token: %w", err)
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, &tokenClaims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
