@@ -13,8 +13,6 @@ type User interface {
 	CreateUser(user model.User) (int, error)
 	GetUserByID(userID int) (model.User, error)
 	GetUser(email, hashedPassword string) (model.User, error)
-	GetUserByToken(token string) (model.User, error)
-	DeleteToken(token string) error
 }
 
 type UserRepository struct {
@@ -78,12 +76,4 @@ func (r *UserRepository) GetUser(email, hashedPassword string) (model.User, erro
 	}
 
 	return user, nil
-}
-
-func (r *UserRepository) GetUserByToken(token string) (model.User, error) {
-	panic("not implemented") // TODO: Implement
-}
-
-func (r *UserRepository) DeleteToken(token string) error {
-	panic("not implemented") // TODO: Implement
 }
