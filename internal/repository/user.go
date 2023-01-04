@@ -12,8 +12,8 @@ import (
 
 type User interface {
 	CreateUser(user model.User) (int, error)
-	GetUser(userID int) (model.User, error)
-	GetUserByEmail(email string) (model.User, error)
+	GetUserByID(userID int) (model.User, error)
+	GetUser(email, hashedPassword string) (model.User, error)
 	SaveToken(username, token string, expirationTime time.Time) error
 	GetUserByToken(token string) (model.User, error)
 	DeleteToken(token string) error
@@ -48,7 +48,7 @@ func (r *UserRepository) CreateUser(user model.User) (int, error) {
 	return id, nil
 }
 
-func (r *UserRepository) GetUser(userID int) (model.User, error) {
+func (r *UserRepository) GetUserByID(userID int) (model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -65,17 +65,17 @@ func (r *UserRepository) GetUser(userID int) (model.User, error) {
 	return user, nil
 }
 
-func (r *UserRepository) GetUserByEmail(email string) (model.User, error) {
+func (r *UserRepository) GetUser(email, hashedPassword string) (model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
-	stmt, err := r.db.Preparex(`SELECT id, email, username, password FROM users WHERE email = $1;`)
+	stmt, err := r.db.Preparex(`SELECT id, email, username, password FROM users WHERE email = $1 AND password = $2;`)
 	if err != nil {
 		return model.User{}, fmt.Errorf("repo: get user: prepare - %w", err)
 	}
 
 	var user model.User
-	if err := stmt.GetContext(ctx, &user, email); err != nil {
+	if err := stmt.GetContext(ctx, &user, email, hashedPassword); err != nil {
 		return model.User{}, fmt.Errorf("repo: ger user: get - %w", err)
 	}
 
