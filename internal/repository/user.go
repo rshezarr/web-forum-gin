@@ -40,7 +40,7 @@ func (r *UserRepository) CreateUser(user model.User) (int, error) {
 	defer stmt.Close()
 
 	var id int
-	if err = stmt.GetContext(ctx, &id, &user.Email, &user.Username, &user.Password); err != nil {
+	if err = stmt.GetContext(ctx, &id, user.Email, user.Username, user.Password); err != nil {
 		return 0, fmt.Errorf("repo: create user: get - %w", err)
 	}
 
