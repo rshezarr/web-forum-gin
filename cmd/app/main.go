@@ -21,7 +21,7 @@ func initConfig() error {
 
 	flag.Parse()
 
-	viper.SetConfigName("forum")
+	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(*configPath)
 
