@@ -6,15 +6,15 @@ CREATE TABLE IF NOT EXISTS users (
 	username VARCHAR(255) UNIQUE NOT NULL,
 	password VARCHAR(255) NOT NULL,
 	posts INTEGER DEFAULT 0,
-	token TEXT DEFAULT NULL,
-    expiration_time TIMESTAMP 
+	token TEXT NULL,
+    expiration_time TIMESTAMP NULL
 );
 
 CREATE TABLE IF NOT EXISTS posts (
 	id SERIAL PRIMARY KEY,
 	user_id INTEGER NOT NULL,
-	title VARCHAR(100),
-	content TEXT,
+	title VARCHAR(100) NOT NULL,
+	content TEXT NOT NULL,
 	creation_time TIMESTAMP NOT NULL,
 	likes INTEGER DEFAULT 0,
 	dislikes INTEGER DEFAULT 0,
@@ -32,17 +32,17 @@ CREATE TABLE IF NOT EXISTS commentaries (
 	user_id INTEGER NOT NULL,
 	post_id INTEGER NOT NULL,
 	content TEXT NOT NULL,
-	likes INT DEFAULT 0,
-	dislikes INT DEFAULT 0,
+	likes INTEGER DEFAULT 0,
+	dislikes INTEGER DEFAULT 0,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS likes (
     user_id INTEGER NOT NULL,
-	post_id INTEGER DEFAULT NULL,
-	commentary_id INTEGER DEFAULT NULL,
-	like BOOLEAN NOT NULL,
+	post_id INTEGER,
+	commentary_id INTEGER,
+	is_like BOOLEAN NOT NULL,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
 	FOREIGN KEY (commentary_id) REFERENCES commentaries(id) ON DELETE CASCADE
@@ -50,9 +50,9 @@ CREATE TABLE IF NOT EXISTS likes (
 
 CREATE TABLE IF NOT EXISTS dislikes (
     user_id INTEGER NOT NULL,
-	post_id INTEGER DEFAULT NULL,
-	commentary_id INTEGER DEFAULT NULL,
-	dislike BOOLEAN NOT NULL,
+	post_id INTEGER,
+	commentary_id INTEGER,
+	is_dislike BOOLEAN NOT NULL,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
 	FOREIGN KEY (commentary_id) REFERENCES commentaries(id) ON DELETE CASCADE
