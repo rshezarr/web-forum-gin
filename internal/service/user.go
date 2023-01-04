@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/sha1"
+	"errors"
 	"fmt"
 	"forum/internal/model"
 	"forum/internal/repository"
@@ -12,7 +13,7 @@ import (
 
 const (
 	salt       = "hjqrhjqw124617ajfhajs"
-	signingKey = "qrkjk#4#%35FSFJlja#4353KSFjH"
+	signingKey = "qrkjk#4#%SFJlja#4353KSFjH"
 	tokenTTL   = 12 * time.Hour
 )
 
@@ -23,8 +24,7 @@ type tokenClaims struct {
 type User interface {
 	CreateUser(user model.User) (int, error)
 	GenerateToken(email, password string) (string, error)
-	ParseToken(token string) (model.User, error)
-	DeleteToken(token string) error
+	ParseToken(token string) (int, error)
 }
 
 type UserService struct {
@@ -75,10 +75,22 @@ func (s *UserService) GenerateToken(email string, password string) (string, erro
 	return user.Token, nil
 }
 
-func (s *UserService) ParseToken(token string) (model.User, error) {
-	panic("not implemented") // TODO: Implement
-}
+func (s *UserService) ParseToken(accessToken string) (int, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
 
-func (s *UserService) DeleteToken(token string) error {
-	panic("not implemented") // TODO: Implement
+		return []byte(signingKey), nil
+	})
+	if err != nil {
+		return 0, fmt.Errorf("service: parse token: parse claims - %w", err)
+	}
+
+	claims, ok := token.Claims.(*tokenClaims)
+	if !ok {
+		return 0, fmt.Errorf("service: parse token: claims - %w", err)
+	}
+
+	return claims.UserId, nil
 }
