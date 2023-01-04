@@ -1,10 +1,13 @@
 package repository
 
 import (
+	"context"
+	"fmt"
 	"forum/internal/model"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/spf13/viper"
 )
 
 type User interface {
@@ -24,8 +27,24 @@ func NewUser(db *sqlx.DB) *UserRepository {
 		db: db,
 	}
 }
+
 func (r *UserRepository) CreateUser(user model.User) (int, error) {
-	panic("not implemented") // TODO: Implement
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
+	defer cancel()
+
+	stmt, err := r.db.Preparex(`INSERT INTO users (email, username, password) VALUES ($1, $2, $3) RETURNING id;`)
+	if err != nil {
+		return 0, fmt.Errorf("repo: create user: prepare - %w", err)
+	}
+
+	defer stmt.Close()
+
+	var id int
+	if err = stmt.GetContext(ctx, &id, &user.Email, &user.Username, &user.Password); err != nil {
+		return 0, fmt.Errorf("repo: create user: get - %w", err)
+	}
+
+	return id, nil
 }
 
 func (r *UserRepository) GetUser(userID int) (model.User, error) {
