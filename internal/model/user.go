@@ -4,11 +4,11 @@ import "time"
 
 type User struct {
 	ID       int    `json:"-"`
-	Email    string `json:"user-email"`
-	Username string `json:"user-username"`
-	Password string `json:"user-password"`
-	Posts    int    `json:"user-posts"`
+	Email    string `json:"user_email"`
+	Username string `json:"user_username"`
+	Password string `json:"user_password"`
+	Posts    int
 
-	Token          string    `json:"user-token"`
-	ExpirationTime time.Time `json:"user-token-expire"`
+	Token          string
+	ExpirationTime time.Time
 }
