@@ -2,7 +2,8 @@ package handler
 
 import (
 	"forum/internal/service"
-	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type Handler struct {
@@ -13,6 +14,8 @@ func NewHandler(service *service.Service) *Handler {
 	return &Handler{service: service}
 }
 
-func (h *Handler) InitRoutes() *http.ServeMux {
-	return nil
+func (h *Handler) InitRoutes() *mux.Router {
+	router := mux.NewRouter()
+
+	return router
 }
