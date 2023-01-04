@@ -22,7 +22,7 @@ type tokenClaims struct {
 }
 type User interface {
 	CreateUser(user model.User) (int, error)
-	GenerateToken(username, password string) (string, error)
+	GenerateToken(email, password string) (string, error)
 	ParseToken(token string) (model.User, error)
 	DeleteToken(token string) error
 }
