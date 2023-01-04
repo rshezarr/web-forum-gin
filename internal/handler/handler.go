@@ -2,6 +2,7 @@ package handler
 
 import (
 	"forum/internal/service"
+	"net/http"
 
 	"github.com/gorilla/mux"
 )
@@ -16,6 +17,8 @@ func NewHandler(service *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *mux.Router {
 	router := mux.NewRouter()
+
+	router.HandleFunc("/user", h.createUser).Methods(http.MethodPost)
 
 	return router
 }
