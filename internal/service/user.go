@@ -21,3 +21,19 @@ func NewUser(repo repository.User) *UserService {
 		repo: repo,
 	}
 }
+
+func (s *UserService) CreateUser(user model.User) (int, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (s *UserService) GenerateToken(username string, password string) (model.User, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (s *UserService) ParseToken(token string) (model.User, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (s *UserService) DeleteToken(token string) error {
+	panic("not implemented") // TODO: Implement
+}
