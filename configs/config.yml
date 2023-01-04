@@ -1,0 +1,15 @@
+api:
+    host: "localhost"
+    addr: ":9090"
+    maxHeaderByte: 1
+    readTimeout: 10
+    writeTimeout: 10
+
+database:
+    databaseUrl: "host=0.0.0.0 port=5432 user=postgres dbname=postgres password=qwerty sslmode=disable"
+    driver: "postgres"
+    dbname: "forum"
+    schemesPath: "./database/schema/"
+    ctxTimeout: 5s
+# Use 'forum' as host if connection through docker compose
+# And 'localhost' or '0.0.0.0' if connection locally
