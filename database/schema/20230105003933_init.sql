@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
 	password VARCHAR(255) NOT NULL,
 	posts INTEGER DEFAULT 0,
 	token TEXT NULL,
-    expiration_time TIMESTAMP NULL
+    expiration_time TIMESTAMP DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS posts (
