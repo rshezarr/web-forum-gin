@@ -44,6 +44,7 @@ func generateHashPassword(password string) string {
 }
 
 func (s *UserService) CreateUser(user model.User) (int, error) {
+	user.Password = generateHashPassword(user.Password)
 	id, err := s.repo.CreateUser(user)
 	if err != nil {
 		return 0, err
