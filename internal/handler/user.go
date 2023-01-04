@@ -38,3 +38,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
+
+}
