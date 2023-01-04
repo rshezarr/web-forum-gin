@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:13-alpine
+    container_name: forum
+    restart: always
+    ports: 
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=qwerty
+      - POSTGRES_USER=postgres
+  api:
+    restart: on-failure
+    build: .
+    ports:
+     - "9090:9090"
