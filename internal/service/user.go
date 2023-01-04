@@ -56,7 +56,7 @@ func (s *UserService) CreateUser(user model.User) (int, error) {
 func (s *UserService) GenerateToken(email string, password string) (string, error) {
 	user, err := s.repo.GetUser(email, generateHashPassword(password))
 	if err != nil {
-		return "", fmt.Errorf("service: generate token: %w", err)
+		return "", fmt.Errorf("service: generate token: get user - %w", err)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
@@ -69,7 +69,7 @@ func (s *UserService) GenerateToken(email string, password string) (string, erro
 
 	user.Token, err = token.SignedString([]byte(signingKey))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("service: generate token: get string - %w", err)
 	}
 
 	return user.Token, nil
