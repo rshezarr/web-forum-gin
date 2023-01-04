@@ -24,3 +24,22 @@ func NewUser(db *sqlx.DB) *UserRepository {
 		db: db,
 	}
 }
+func (r *UserRepository) CreateUser(user model.User) (int, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *UserRepository) GetUser(userID int) (model.User, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *UserRepository) SaveToken(username string, token string, expirationTime time.Time) error {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *UserRepository) GetUserByToken(token string) (model.User, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *UserRepository) DeleteToken(token string) error {
+	panic("not implemented") // TODO: Implement
+}
