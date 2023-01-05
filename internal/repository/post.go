@@ -88,7 +88,20 @@ func (r *PostRepository) GetPostByID(postId int) (model.Post, error) {
 	return post, nil
 }
 
-func (r *PostRepository) UpdatePost(postId int) error {
+func (r *PostRepository) UpdatePost(newPost model.Post) error {
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
+	defer cancel()
+
+	stmt, err := r.db.Preparex(`UPDATE posts SET title = $1, content = $2 WHERE id = $3`)
+	if err != nil {
+		return fmt.Errorf("repo: update post: prepare - %w", err)
+	}
+
+	_, err = stmt.ExecContext(ctx, newPost.Title, newPost.Content, newPost.ID)
+	if err != nil {
+		return fmt.Errorf("repo: update post: exec - %w", err)
+	}
+
 	return nil
 }
 
