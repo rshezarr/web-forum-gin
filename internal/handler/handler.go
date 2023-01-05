@@ -27,8 +27,8 @@ func (h *Handler) InitRoutes() *mux.Router {
 	post.HandleFunc("/create", h.createPost).Methods(http.MethodPost)
 	post.HandleFunc("/edit", h.editPost).Methods(http.MethodPut)
 	post.HandleFunc("/delete", h.deletePost).Methods(http.MethodDelete)
-	post.HandleFunc("/like", h.createPost).Methods(http.MethodPost)
-	post.HandleFunc("/dislike", h.createPost).Methods(http.MethodPost)
+	post.HandleFunc("/like", h.likePost).Methods(http.MethodPost)
+	post.HandleFunc("/dislike", h.dislikePost).Methods(http.MethodPost)
 
 	return router
 }
