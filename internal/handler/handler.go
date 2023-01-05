@@ -26,7 +26,7 @@ func (h *Handler) InitRoutes() *mux.Router {
 	post.Use(h.authMiddleware)
 	post.HandleFunc("/", h.posts).Methods(http.MethodGet)
 	post.HandleFunc("/create", h.createPost).Methods(http.MethodPost)
-	post.HandleFunc("/edit/{post_id}", h.updatePost).Methods(http.MethodPut)
+	post.HandleFunc("/update/{post_id}", h.updatePost).Methods(http.MethodPut)
 	post.HandleFunc("/delete/{post_id}", h.deletePost).Methods(http.MethodDelete)
 	post.HandleFunc("/like/{post_id}", h.likePost).Methods(http.MethodPost)
 	post.HandleFunc("/dislike/{post_id}", h.dislikePost).Methods(http.MethodPost)
