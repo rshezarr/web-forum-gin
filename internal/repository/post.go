@@ -1,9 +1,13 @@
 package repository
 
 import (
+	"context"
+	"database/sql"
+	"fmt"
 	"forum/internal/model"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/spf13/viper"
 )
 
 type Post interface {
@@ -25,11 +29,65 @@ func NewPost(db *sqlx.DB) *PostRepository {
 }
 
 func (r *PostRepository) CreatePost(post model.Post) (int, error) {
-	panic("not implemented") // TODO: Implement
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
+	defer cancel()
+
+	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelReadCommitted,
+		ReadOnly:  true,
+	})
+	if err != nil {
+		return 0, fmt.Errorf("repo: create post: begin - %w", err)
+	}
+
+	//first query
+	stmt, err := tx.Preparex(`INSERT INTO posts (title, content, user_id) VALUES ($1, $2, $3) RETURNING id;`)
+	if err != nil {
+		tx.Rollback()
+		return 0, fmt.Errorf("repo: create post: first query: prepare - %w", err)
+	}
+
+	var postID int
+	if err := stmt.GetContext(ctx, &postID, post.Title, post.Content, post.UserID); err != nil {
+		tx.Rollback()
+		return 0, fmt.Errorf("repo: create post: first query: get - %w", err)
+	}
+
+	defer stmt.Close()
+
+	//second query
+	stmt, err = tx.Preparex(`UPDATE users SET posts = posts + 1 WHERE id = $1;`)
+	if err != nil {
+		tx.Rollback()
+		return 0, fmt.Errorf("repo: create post: second query: prepare - %w", err)
+	}
+
+	_, err = stmt.ExecContext(ctx, post.UserID)
+	if err != nil {
+		tx.Rollback()
+		return 0, fmt.Errorf("repo: create post: second query: prepare - %w", err)
+	}
+
+	//third query
+	for _, category := range post.Category {
+		stmt, err := tx.Preparex(`INSERT INTO post_category (post_id, category) VALUES ($1, $2);`)
+		if err != nil {
+			tx.Rollback()
+			return 0, fmt.Errorf("repo: create post: third query: prepare - %w", err)
+		}
+
+		_, err = stmt.ExecContext(ctx, category)
+		if err != nil {
+			tx.Rollback()
+			return 0, fmt.Errorf("repo: create post: third query: prepare - %w", err)
+		}
+	}
+
+	return postID, nil
 }
 
 func (r *PostRepository) GetAllPosts() ([]model.Post, error) {
-	panic("not implemented") // TODO: Implement
+	panic("not implemented")
 }
 
 func (r *PostRepository) GetPostByID(postId int) (model.Post, error) {
