@@ -5,6 +5,7 @@ import (
 	"forum/internal/model"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -63,8 +64,12 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:  "session_token",
-		Value: token,
+		Name:     "session_token",
+		Value:    token,
+		Expires:  time.Now().Add(12 * time.Hour),
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
 	})
 
 	if err := json.NewEncoder(w).Encode(&token); err != nil {
