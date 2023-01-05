@@ -12,8 +12,10 @@ import (
 
 type Post interface {
 	CreatePost(post model.Post) (int, error)
-	GetAllPosts() ([]model.Post, error)
 	GetPostByID(postId int) (model.Post, error)
+	UpdatePost(newPost model.Post) (int, error)
+	DeletePost(postId int) (int, error)
+	GetAllPosts() ([]model.Post, error)
 }
 
 type PostRepository struct {
@@ -69,23 +71,6 @@ func (r *PostRepository) CreatePost(post model.Post) (int, error) {
 	return postID, fmt.Errorf("repo: create post: commit - %w", tx.Commit())
 }
 
-func (r *PostRepository) GetAllPosts() ([]model.Post, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
-	defer cancel()
-
-	stmt, err := r.db.Preparex(`SELECT id, user_id, title, content, creation_time, likes, dislikes FROM posts;`)
-	if err != nil {
-		return nil, fmt.Errorf("repo: get all posts: prepare - %w", err)
-	}
-
-	var posts []model.Post
-	if err := stmt.SelectContext(ctx, &posts); err != nil {
-		return nil, fmt.Errorf("repo: get all posts: select - %w", err)
-	}
-
-	return posts, nil
-}
-
 func (r *PostRepository) GetPostByID(postId int) (model.Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
@@ -101,4 +86,29 @@ func (r *PostRepository) GetPostByID(postId int) (model.Post, error) {
 	}
 
 	return post, nil
+}
+
+func (r *PostRepository) UpdatePost(postId int) error {
+	return nil
+}
+
+func (r *PostRepository) DeletePost(postId int) error {
+	return nil
+}
+
+func (r *PostRepository) GetAllPosts() ([]model.Post, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
+	defer cancel()
+
+	stmt, err := r.db.Preparex(`SELECT id, user_id, title, content, creation_time, likes, dislikes FROM posts;`)
+	if err != nil {
+		return nil, fmt.Errorf("repo: get all posts: prepare - %w", err)
+	}
+
+	var posts []model.Post
+	if err := stmt.SelectContext(ctx, &posts); err != nil {
+		return nil, fmt.Errorf("repo: get all posts: select - %w", err)
+	}
+
+	return posts, nil
 }
