@@ -32,22 +32,18 @@ CREATE TABLE IF NOT EXISTS commentaries (
 
 CREATE TABLE IF NOT EXISTS likes (
     user_id INTEGER NOT NULL,
-	post_id INTEGER,
-	commentary_id INTEGER,
-	is_like BOOLEAN NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-	FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-	FOREIGN KEY (commentary_id) REFERENCES commentaries(id) ON DELETE CASCADE
+	content_type VARCHAR(10) NOT NULL,
+  	content_id INTEGER NOT NULL,
+  	is_like BOOLEAN NOT NULL DEFAULT TRUE,
+  	PRIMARY KEY (user_id, content_type, content_id)
 );
 
 CREATE TABLE IF NOT EXISTS dislikes (
     user_id INTEGER NOT NULL,
-	post_id INTEGER,
-	commentary_id INTEGER,
-	is_dislike BOOLEAN NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-	FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-	FOREIGN KEY (commentary_id) REFERENCES commentaries(id) ON DELETE CASCADE
+	content_type VARCHAR(10) NOT NULL,
+  	content_id INTEGER NOT NULL,
+  	is_dislike BOOLEAN NOT NULL DEFAULT TRUE,
+  	PRIMARY KEY (user_id, content_type, content_id)
 );
 -- +goose StatementEnd
 
