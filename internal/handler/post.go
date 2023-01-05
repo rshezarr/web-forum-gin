@@ -5,9 +5,7 @@ import (
 	"forum/internal/model"
 	"io"
 	"net/http"
-	"strconv"
 
-	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
@@ -56,35 +54,8 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value(ctxKeyUser).(int)
+func (h *Handler) editPost(w http.ResponseWriter, r *http.Request) {
 
-	postId, err := strconv.Atoi(mux.Vars(r)["post_id"])
-	if err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	newPost := model.Post{
-		ID:      postId,
-		UserID:  userId,
-		Title:   r.FormValue("post_title"),
-		Content: r.FormValue("post_content"),
-	}
-
-	id, err := h.service.Post.UpdatePost(newPost)
-	if err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	if err := json.NewEncoder(w).Encode(&id); err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
 }
 
 func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
