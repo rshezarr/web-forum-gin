@@ -14,8 +14,6 @@ type Post interface {
 	CreatePost(post model.Post) (int, error)
 	GetAllPosts() ([]model.Post, error)
 	GetPostByID(postId int) (model.Post, error)
-	GetPostsByCategory(category string) ([]model.Post, error)
-	GetCategoriesByPostID(postId int) ([]string, error)
 }
 
 type PostRepository struct {
@@ -65,25 +63,10 @@ func (r *PostRepository) CreatePost(post model.Post) (int, error) {
 	_, err = stmt.ExecContext(ctx, post.UserID)
 	if err != nil {
 		tx.Rollback()
-		return 0, fmt.Errorf("repo: create post: second query: prepare - %w", err)
+		return 0, fmt.Errorf("repo: create post: second query: exec - %w", err)
 	}
 
-	//third query
-	for _, category := range post.Category {
-		stmt, err := tx.Preparex(`INSERT INTO post_category (post_id, category) VALUES ($1, $2);`)
-		if err != nil {
-			tx.Rollback()
-			return 0, fmt.Errorf("repo: create post: third query: prepare - %w", err)
-		}
-
-		_, err = stmt.ExecContext(ctx, category)
-		if err != nil {
-			tx.Rollback()
-			return 0, fmt.Errorf("repo: create post: third query: prepare - %w", err)
-		}
-	}
-
-	return postID, nil
+	return postID, fmt.Errorf("repo: create post: commit - %w", tx.Commit())
 }
 
 func (r *PostRepository) GetAllPosts() ([]model.Post, error) {
@@ -104,13 +87,18 @@ func (r *PostRepository) GetAllPosts() ([]model.Post, error) {
 }
 
 func (r *PostRepository) GetPostByID(postId int) (model.Post, error) {
-	panic("not implemented") // TODO: Implement
-}
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
+	defer cancel()
 
-func (r *PostRepository) GetPostsByCategory(category string) ([]model.Post, error) {
-	panic("not implemented") // TODO: Implement
-}
+	stmt, err := r.db.Preparex(`SELECT id, user_id, title, content, creation_time, likes, dislikes FROM posts WHERE id = $1;`)
+	if err != nil {
+		return model.Post{}, fmt.Errorf("repo: get post by id: prepare - %w", err)
+	}
 
-func (r *PostRepository) GetCategoriesByPostID(postId int) ([]string, error) {
-	panic("not implemented") // TODO: Implement
+	var post model.Post
+	if err := stmt.GetContext(ctx, &post, postId); err != nil {
+		return model.Post{}, fmt.Errorf("repo: get post by id: get - %w", err)
+	}
+
+	return post, nil
 }
