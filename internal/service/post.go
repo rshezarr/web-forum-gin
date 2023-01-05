@@ -76,7 +76,11 @@ func (s *PostService) UpdatePost(newPost model.Post) (int, error) {
 	return id, nil
 }
 
-func (s *PostService) DeletePost(newPost model.Post) error {
+func (s *PostService) DeletePost(postId int) error {
+	if err := s.repo.DeletePost(postId); err != nil {
+		return fmt.Errorf("service: delete post: %w", err)
+	}
+
 	return nil
 }
 
