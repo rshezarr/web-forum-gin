@@ -1,14 +1,18 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"forum/internal/model"
+
+	"github.com/jmoiron/sqlx"
+)
 
 type VotePost interface {
-	LikePost(userId, contentId int, contentType string) error
-	DislikePost(userId, contentId int, contentType string) error
-	IsLikedPost(userId, contentId int, contentType string) (bool, error)
-	IsDislikedPost(userId, contentId int, contentType string) (bool, error)
-	RemoveLike(userId, contentId int, contentType string) error
-	RemoveDislike(userId, contentId int, contentType string) error
+	LikePost(vote model.Vote) error
+	DislikePost(vote model.Vote) error
+	IsLikedPost(vote model.Vote) (bool, error)
+	IsDislikedPost(vote model.Vote) (bool, error)
+	RemoveLike(vote model.Vote) error
+	RemoveDislike(vote model.Vote) error
 }
 
 type VotePostRepository struct {
@@ -21,26 +25,26 @@ func NewVotePost(db *sqlx.DB) *VotePostRepository {
 	}
 }
 
-func (r *VotePostRepository) LikePost(userId int, contentId int, contentType string) error {
+func (r *VotePostRepository) LikePost(vote model.Vote) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (r *VotePostRepository) DislikePost(userId int, contentId int, contentType string) error {
+func (r *VotePostRepository) DislikePost(vote model.Vote) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (r *VotePostRepository) IsLikedPost(userId int, contentId int, contentType string) (bool, error) {
+func (r *VotePostRepository) IsLikedPost(vote model.Vote) (bool, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (r *VotePostRepository) IsDislikedPost(userId int, contentId int, contentType string) (bool, error) {
+func (r *VotePostRepository) IsDislikedPost(vote model.Vote) (bool, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (r *VotePostRepository) RemoveLike(userId int, contentId int, contentType string) error {
+func (r *VotePostRepository) RemoveLike(vote model.Vote) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (r *VotePostRepository) RemoveDislike(userId int, contentId int, contentType string) error {
+func (r *VotePostRepository) RemoveDislike(vote model.Vote) error {
 	panic("not implemented") // TODO: Implement
 }
