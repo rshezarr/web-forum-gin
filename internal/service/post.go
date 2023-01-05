@@ -18,8 +18,10 @@ var (
 
 type Post interface {
 	CreatePost(post model.Post) (int, error)
-	GetAllPosts() ([]model.Post, error)
 	GetPostByID(postId int) (model.Post, error)
+	UpdatePost(newPost model.Post) error
+	DeletePost(postId int) error
+	GetAllPosts() ([]model.Post, error)
 }
 
 type PostService struct {
@@ -65,13 +67,12 @@ func (s *PostService) CreatePost(post model.Post) (int, error) {
 	return id, nil
 }
 
-func (s *PostService) GetAllPosts() ([]model.Post, error) {
-	allPosts, err := s.repo.GetAllPosts()
-	if err != nil {
-		return nil, fmt.Errorf("service: get all posts: %w", err)
-	}
+func (s *PostService) UpdatePost(newPost model.Post) error {
+	return nil
+}
 
-	return allPosts, nil
+func (s *PostService) DeletePost(newPost model.Post) error {
+	return nil
 }
 
 func (s *PostService) GetPostByID(postId int) (model.Post, error) {
@@ -81,4 +82,13 @@ func (s *PostService) GetPostByID(postId int) (model.Post, error) {
 	}
 
 	return post, nil
+}
+
+func (s *PostService) GetAllPosts() ([]model.Post, error) {
+	allPosts, err := s.repo.GetAllPosts()
+	if err != nil {
+		return nil, fmt.Errorf("service: get all posts: %w", err)
+	}
+
+	return allPosts, nil
 }
