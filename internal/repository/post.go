@@ -106,7 +106,57 @@ func (r *PostRepository) UpdatePost(newPost model.Post) error {
 }
 
 func (r *PostRepository) DeletePost(postId int) error {
-	return nil
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
+	defer cancel()
+
+	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelReadCommitted,
+		ReadOnly:  true,
+	})
+	if err != nil {
+		return fmt.Errorf("repo: delete post: begin - %w", err)
+	}
+
+	//first query
+	stmt, err := tx.Preparex(`SELECT user_id FROM posts WHERE id = $1`)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("repo: delete post: first query: prepare - %w", err)
+	}
+
+	var userId int
+	if err := stmt.GetContext(ctx, &userId, postId); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("repo: delete post: first query: get - %w", err)
+	}
+
+	//second query
+	stmt, err = tx.Preparex(`DELETE FROM posts WHERE id = $1;`)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("repo: delete post: second query: prepare - %w", err)
+	}
+
+	_, err = stmt.ExecContext(ctx, postId)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("repo: delete post: second query: exec - %w", err)
+	}
+
+	//third query
+	stmt, err = tx.Preparex(`UPDATE users SET posts = posts - 1 WHERE id = $1`)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("repo: delete post: third query: prepare - %w", err)
+	}
+
+	_, err = stmt.ExecContext(ctx, userId)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("repo: delete post: third query: exec - %w", err)
+	}
+
+	return tx.Commit()
 }
 
 func (r *PostRepository) GetAllPosts() ([]model.Post, error) {
