@@ -88,7 +88,18 @@ func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
+	postId, err := strconv.Atoi(mux.Vars(r)["post_id"])
+	if err != nil {
+		logrus.Error(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
+	if err := h.service.Post.DeletePost(postId); err != nil {
+		logrus.Error(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *Handler) likePost(w http.ResponseWriter, r *http.Request) {
