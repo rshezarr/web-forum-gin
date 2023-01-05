@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"forum/internal/model"
 	"io"
 	"net/http"
@@ -30,7 +29,7 @@ func (h *Handler) posts(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(ctxKeyUser).(int)
-	fmt.Printf("creaet post user id %d\n", userId)
+
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		logrus.Error(err)

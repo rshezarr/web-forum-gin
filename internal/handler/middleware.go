@@ -13,9 +13,9 @@ type ctxKey int8
 
 func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("session_cookie")
+		cookie, err := r.Cookie("session_token")
 		if err != nil {
-			logrus.Errorf("cookie: %w", err)
+			logrus.Errorf("cookie: %s", err.Error())
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}

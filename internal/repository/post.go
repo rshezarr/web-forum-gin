@@ -34,21 +34,21 @@ func (r *PostRepository) CreatePost(post model.Post) (int, error) {
 
 	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelReadCommitted,
-		ReadOnly:  true,
+		ReadOnly:  false,
 	})
 	if err != nil {
 		return 0, fmt.Errorf("repo: create post: begin - %w", err)
 	}
 
 	//first query
-	stmt, err := tx.Preparex(`INSERT INTO posts (title, content, user_id) VALUES ($1, $2, $3) RETURNING id;`)
+	stmt, err := tx.Preparex(`INSERT INTO posts (title, content, user_id, creation_time) VALUES ($1, $2, $3, $4) RETURNING id;`)
 	if err != nil {
 		tx.Rollback()
 		return 0, fmt.Errorf("repo: create post: first query: prepare - %w", err)
 	}
 
 	var postID int
-	if err := stmt.GetContext(ctx, &postID, post.Title, post.Content, post.UserID); err != nil {
+	if err := stmt.GetContext(ctx, &postID, post.Title, post.Content, post.UserID, post.CreationTime); err != nil {
 		tx.Rollback()
 		return 0, fmt.Errorf("repo: create post: first query: get - %w", err)
 	}
@@ -68,7 +68,7 @@ func (r *PostRepository) CreatePost(post model.Post) (int, error) {
 		return 0, fmt.Errorf("repo: create post: second query: exec - %w", err)
 	}
 
-	return postID, fmt.Errorf("repo: create post: commit - %w", tx.Commit())
+	return postID, tx.Commit()
 }
 
 func (r *PostRepository) GetPostByID(postId int) (model.Post, error) {
@@ -111,7 +111,7 @@ func (r *PostRepository) DeletePost(postId int) error {
 
 	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelReadCommitted,
-		ReadOnly:  true,
+		ReadOnly:  false,
 	})
 	if err != nil {
 		return fmt.Errorf("repo: delete post: begin - %w", err)
