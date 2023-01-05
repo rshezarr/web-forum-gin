@@ -19,7 +19,7 @@ var (
 type Post interface {
 	CreatePost(post model.Post) (int, error)
 	GetPostByID(postId int) (model.Post, error)
-	UpdatePost(newPost model.Post) error
+	UpdatePost(newPost model.Post) (int, error)
 	DeletePost(postId int) error
 	GetAllPosts() ([]model.Post, error)
 }
@@ -67,8 +67,13 @@ func (s *PostService) CreatePost(post model.Post) (int, error) {
 	return id, nil
 }
 
-func (s *PostService) UpdatePost(newPost model.Post) error {
-	return nil
+func (s *PostService) UpdatePost(newPost model.Post) (int, error) {
+	id, err := s.repo.UpdatePost(newPost)
+	if err != nil {
+		return 0, fmt.Errorf("service: update post: %w", err)
+	}
+
+	return id, nil
 }
 
 func (s *PostService) DeletePost(newPost model.Post) error {
