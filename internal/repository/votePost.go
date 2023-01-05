@@ -20,3 +20,27 @@ func NewVotePost(db *sqlx.DB) *VotePostRepository {
 		db: db,
 	}
 }
+
+func (r *VotePostRepository) LikePost(userId int, contentId int, contentType string) error {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *VotePostRepository) DislikePost(userId int, contentId int, contentType string) error {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *VotePostRepository) IsLikedPost(userId int, contentId int, contentType string) (bool, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *VotePostRepository) IsDislikedPost(userId int, contentId int, contentType string) (bool, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *VotePostRepository) RemoveLike(userId int, contentId int, contentType string) error {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *VotePostRepository) RemoveDislike(userId int, contentId int, contentType string) error {
+	panic("not implemented") // TODO: Implement
+}
