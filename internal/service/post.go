@@ -75,5 +75,10 @@ func (s *PostService) GetAllPosts() ([]model.Post, error) {
 }
 
 func (s *PostService) GetPostByID(postId int) (model.Post, error) {
-	panic("not implemented") // TODO: Implement
+	post, err := s.repo.GetPostByID(postId)
+	if err != nil {
+		return model.Post{}, fmt.Errorf("service: get post by id: %w", err)
+	}
+
+	return post, nil
 }
