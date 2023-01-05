@@ -23,7 +23,12 @@ func (h *Handler) InitRoutes() *mux.Router {
 	auth.HandleFunc("/sign-in", h.signIn).Methods(http.MethodPost)
 
 	post := router.PathPrefix("/post").Subrouter()
-	post.HandleFunc("/create-post", h.createPost).Methods(http.MethodPost)
+	post.HandleFunc("/", h.posts).Methods(http.MethodGet)
+	post.HandleFunc("/create", h.createPost).Methods(http.MethodPost)
+	post.HandleFunc("/edit", h.editPost).Methods(http.MethodPut)
+	post.HandleFunc("/delete", h.deletePost).Methods(http.MethodDelete)
+	post.HandleFunc("/like", h.createPost).Methods(http.MethodPost)
+	post.HandleFunc("/dislike", h.createPost).Methods(http.MethodPost)
 
 	return router
 }
