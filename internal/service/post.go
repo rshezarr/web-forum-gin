@@ -20,3 +20,15 @@ func NewPost(repo repository.Post) *PostService {
 		repo: repo,
 	}
 }
+
+func (s *PostService) CreatePost(post model.Post) (int, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (s *PostService) GetAllPosts() ([]model.Post, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (s *PostService) GetPostByID(postId int) (model.Post, error) {
+	panic("not implemented") // TODO: Implement
+}
