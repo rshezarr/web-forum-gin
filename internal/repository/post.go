@@ -23,3 +23,23 @@ func NewPost(db *sqlx.DB) *PostRepository {
 		db: db,
 	}
 }
+
+func (r *PostRepository) CreatePost(post model.Post) (int, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *PostRepository) GetAllPosts() ([]model.Post, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *PostRepository) GetPostByID(postId int) (model.Post, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *PostRepository) GetPostsByCategory(category string) ([]model.Post, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *PostRepository) GetCategoriesByPostID(postId int) ([]string, error) {
+	panic("not implemented") // TODO: Implement
+}
