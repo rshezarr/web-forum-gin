@@ -87,7 +87,20 @@ func (r *PostRepository) CreatePost(post model.Post) (int, error) {
 }
 
 func (r *PostRepository) GetAllPosts() ([]model.Post, error) {
-	panic("not implemented")
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
+	defer cancel()
+
+	stmt, err := r.db.Preparex(`SELECT id, user_id, title, content, creation_time, likes, dislikes FROM posts;`)
+	if err != nil {
+		return nil, fmt.Errorf("repo: get all posts: prepare - %w", err)
+	}
+
+	var posts []model.Post
+	if err := stmt.SelectContext(ctx, &posts); err != nil {
+		return nil, fmt.Errorf("repo: get all posts: select - %w", err)
+	}
+
+	return posts, nil
 }
 
 func (r *PostRepository) GetPostByID(postId int) (model.Post, error) {
