@@ -9,8 +9,8 @@ const ctxKeyUser ctxKey = iota
 
 type ctxKey int8
 
-func (h *Handler) authMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_cookie")
 		if err != nil {
 			return
@@ -23,5 +23,5 @@ func (h *Handler) authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, userID)))
-	}
+	})
 }
