@@ -23,6 +23,7 @@ func (h *Handler) InitRoutes() *mux.Router {
 	auth.HandleFunc("/sign-in", h.signIn).Methods(http.MethodPost)
 
 	post := router.PathPrefix("/post").Subrouter()
+	post.Use(h.authMiddleware)
 	post.HandleFunc("/", h.posts).Methods(http.MethodGet)
 	post.HandleFunc("/create", h.createPost).Methods(http.MethodPost)
 	post.HandleFunc("/edit/{post_id}", h.editPost).Methods(http.MethodPut)
