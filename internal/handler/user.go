@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"forum/internal/model"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -12,7 +12,7 @@ import (
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 
-	data, err := ioutil.ReadAll(r.Body)
+	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		logrus.Errorf("sign up: new decode - %s", err.Error())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -42,7 +42,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 
-	data, err := ioutil.ReadAll(r.Body)
+	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		logrus.Errorf("sign in: new decode - %s", err.Error())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
