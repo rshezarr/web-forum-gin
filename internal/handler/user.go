@@ -62,6 +62,11 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:  "session_token",
+		Value: token,
+	})
+
 	if err := json.NewEncoder(w).Encode(&token); err != nil {
 		logrus.Errorf("sign in: response id - %s", err.Error())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

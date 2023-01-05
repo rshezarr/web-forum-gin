@@ -3,6 +3,8 @@ package handler
 import (
 	"context"
 	"net/http"
+
+	"github.com/sirupsen/logrus"
 )
 
 const ctxKeyUser ctxKey = iota
@@ -13,6 +15,8 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_cookie")
 		if err != nil {
+			logrus.Errorf("cookie: %w", err)
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 
