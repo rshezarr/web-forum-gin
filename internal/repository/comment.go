@@ -14,8 +14,8 @@ type Comment interface {
 	GetByID(id int) (model.Comment, error)
 	GetByUserID(userId int) ([]model.Comment, error)
 	GetByPostID(postId int) ([]model.Comment, error)
-	Update(userId int) (int, error)
-	Delete(userId int) error
+	Update(newComment string, id int) (int, error)
+	Delete(id int) error
 }
 
 type CommentRepository struct {
@@ -78,6 +78,8 @@ func (r *CommentRepository) GetByUserID(userId int) ([]model.Comment, error) {
 		return nil, fmt.Errorf("repo: get comment by id: prepare - %w", err)
 	}
 
+	defer stmt.Close()
+
 	return comments, nil
 }
 
@@ -95,13 +97,30 @@ func (r *CommentRepository) GetByPostID(postId int) ([]model.Comment, error) {
 		return nil, fmt.Errorf("repo: get comment by id: prepare - %w", err)
 	}
 
+	defer stmt.Close()
+
 	return comments, nil
 }
 
-func (r *CommentRepository) Update(userId int) (int, error) {
-	return 0, nil
+func (r *CommentRepository) Update(newComment string, id int) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
+	defer cancel()
+
+	stmt, err := r.db.Preparex(`UPDATE commentaries SET content = $1 WHERE id = $2;`)
+	if err != nil {
+		return 0, fmt.Errorf("repo: update comment: prepare - %w", err)
+	}
+
+	var commentId int
+	if err := stmt.GetContext(ctx, &commentId, newComment, id); err != nil {
+		return 0, fmt.Errorf("repo: update comment: prepare - %w", err)
+	}
+
+	defer stmt.Close()
+
+	return commentId, nil
 }
 
-func (r *CommentRepository) Delete(userId int) error {
+func (r *CommentRepository) Delete(id int) error {
 	return nil
 }
