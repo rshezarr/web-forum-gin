@@ -11,11 +11,11 @@ import (
 )
 
 type Post interface {
-	CreatePost(post model.Post) (int, error)
-	GetPostByID(postId int) (model.Post, error)
-	UpdatePost(newPost model.Post) (int, error)
-	DeletePost(postId int) error
-	GetAllPosts() ([]model.Post, error)
+	Create(post model.Post) (int, error)
+	GetByID(id int) (model.Post, error)
+	Update(newPost model.Post) (int, error)
+	Delete(id int) error
+	GetAll() ([]model.Post, error)
 }
 
 type PostRepository struct {
@@ -28,7 +28,7 @@ func NewPost(db *sqlx.DB) *PostRepository {
 	}
 }
 
-func (r *PostRepository) CreatePost(post model.Post) (int, error) {
+func (r *PostRepository) Create(post model.Post) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -47,8 +47,8 @@ func (r *PostRepository) CreatePost(post model.Post) (int, error) {
 		return 0, fmt.Errorf("repo: create post: first query: prepare - %w", err)
 	}
 
-	var postID int
-	if err := stmt.GetContext(ctx, &postID, post.Title, post.Content, post.UserID, post.CreationTime); err != nil {
+	var id int
+	if err := stmt.GetContext(ctx, &id, post.Title, post.Content, post.UserID, post.CreationTime); err != nil {
 		tx.Rollback()
 		return 0, fmt.Errorf("repo: create post: first query: get - %w", err)
 	}
@@ -68,10 +68,10 @@ func (r *PostRepository) CreatePost(post model.Post) (int, error) {
 		return 0, fmt.Errorf("repo: create post: second query: exec - %w", err)
 	}
 
-	return postID, tx.Commit()
+	return id, tx.Commit()
 }
 
-func (r *PostRepository) GetPostByID(postId int) (model.Post, error) {
+func (r *PostRepository) GetByID(id int) (model.Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -81,14 +81,14 @@ func (r *PostRepository) GetPostByID(postId int) (model.Post, error) {
 	}
 
 	var post model.Post
-	if err := stmt.GetContext(ctx, &post, postId); err != nil {
+	if err := stmt.GetContext(ctx, &post, id); err != nil {
 		return model.Post{}, fmt.Errorf("repo: get post by id: get - %w", err)
 	}
 
 	return post, nil
 }
 
-func (r *PostRepository) UpdatePost(newPost model.Post) (int, error) {
+func (r *PostRepository) Update(newPost model.Post) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -97,15 +97,15 @@ func (r *PostRepository) UpdatePost(newPost model.Post) (int, error) {
 		return 0, fmt.Errorf("repo: update post: prepare - %w", err)
 	}
 
-	var userId int
-	if err := stmt.GetContext(ctx, &userId, newPost.Title, newPost.Content, newPost.ID); err != nil {
+	var id int
+	if err := stmt.GetContext(ctx, &id, newPost.Title, newPost.Content, newPost.ID); err != nil {
 		return 0, fmt.Errorf("repo: update post: exec - %w", err)
 	}
 
-	return userId, nil
+	return id, nil
 }
 
-func (r *PostRepository) DeletePost(postId int) error {
+func (r *PostRepository) Delete(postId int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -159,7 +159,7 @@ func (r *PostRepository) DeletePost(postId int) error {
 	return tx.Commit()
 }
 
-func (r *PostRepository) GetAllPosts() ([]model.Post, error) {
+func (r *PostRepository) GetAll() ([]model.Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
