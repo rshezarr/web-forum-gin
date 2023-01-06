@@ -2,9 +2,8 @@ package handler
 
 import (
 	"forum/internal/service"
-	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
@@ -15,21 +14,26 @@ func NewHandler(service *service.Service) *Handler {
 	return &Handler{service: service}
 }
 
-func (h *Handler) InitRoutes() *mux.Router {
-	router := mux.NewRouter()
+func (h *Handler) InitRoutes() *gin.Engine {
+	router := gin.New()
 
-	auth := router.PathPrefix("/user").Subrouter()
-	auth.HandleFunc("/sign-up", h.signUp).Methods(http.MethodPost)
-	auth.HandleFunc("/sign-in", h.signIn).Methods(http.MethodPost)
+	auth := router.Group("/user")
+	{
+		auth.POST("/sign-up", h.signUp)
+		auth.POST("/sign-in", h.signIn)
+	}
 
-	post := router.PathPrefix("/post").Subrouter()
-	post.Use(h.authMiddleware)
-	post.HandleFunc("/", h.posts).Methods(http.MethodGet)
-	post.HandleFunc("/create", h.createPost).Methods(http.MethodPost)
-	post.HandleFunc("/update/{post_id}", h.updatePost).Methods(http.MethodPut)
-	post.HandleFunc("/delete/{post_id}", h.deletePost).Methods(http.MethodDelete)
-	post.HandleFunc("/like/{post_id}", h.likePost).Methods(http.MethodPost)
-	post.HandleFunc("/dislike/{post_id}", h.dislikePost).Methods(http.MethodPost)
-
+	api := router.Group("/api", h.authMiddleware)
+	{
+		post := api.Group("/post")
+		{
+			post.GET("/", h.posts)
+			post.POST("/create", h.createPost)
+			post.PUT("/update/:post_id", h.updatePost)
+			post.DELETE("/delete/:post_id", h.deletePost)
+			post.POST("/like/:post_id", h.likePost)
+			post.POST("/dislike/:post_id", h.dislikePost)
+		}
+	}
 	return router
 }
