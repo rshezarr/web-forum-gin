@@ -10,9 +10,9 @@ import (
 )
 
 type User interface {
-	CreateUser(user model.User) (int, error)
-	GetUserByID(userID int) (model.User, error)
-	GetUser(email, hashedPassword string) (model.User, error)
+	Create(user model.User) (int, error)
+	GetByID(userID int) (model.User, error)
+	GetBySignIn(email, hashedPassword string) (model.User, error)
 }
 
 type UserRepository struct {
@@ -25,7 +25,7 @@ func NewUser(db *sqlx.DB) *UserRepository {
 	}
 }
 
-func (r *UserRepository) CreateUser(user model.User) (int, error) {
+func (r *UserRepository) Create(user model.User) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -34,17 +34,17 @@ func (r *UserRepository) CreateUser(user model.User) (int, error) {
 		return 0, fmt.Errorf("repo: create user: prepare - %w", err)
 	}
 
-	defer stmt.Close()
-
 	var id int
 	if err = stmt.GetContext(ctx, &id, user.Email, user.Username, user.Password); err != nil {
 		return 0, fmt.Errorf("repo: create user: get - %w", err)
 	}
 
+	defer stmt.Close()
+
 	return id, nil
 }
 
-func (r *UserRepository) GetUserByID(userID int) (model.User, error) {
+func (r *UserRepository) GetByID(userID int) (model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -55,13 +55,15 @@ func (r *UserRepository) GetUserByID(userID int) (model.User, error) {
 
 	var user model.User
 	if err := stmt.GetContext(ctx, &user, userID); err != nil {
-		return model.User{}, fmt.Errorf("repo: ger user: get - %w", err)
+		return model.User{}, fmt.Errorf("repo: get user: get - %w", err)
 	}
+
+	defer stmt.Close()
 
 	return user, nil
 }
 
-func (r *UserRepository) GetUser(email, hashedPassword string) (model.User, error) {
+func (r *UserRepository) GetBySignIn(email, hashedPassword string) (model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -72,8 +74,10 @@ func (r *UserRepository) GetUser(email, hashedPassword string) (model.User, erro
 
 	var user model.User
 	if err := stmt.GetContext(ctx, &user, email, hashedPassword); err != nil {
-		return model.User{}, fmt.Errorf("repo: ger user: get - %w", err)
+		return model.User{}, fmt.Errorf("repo: get user: get - %w", err)
 	}
+
+	defer stmt.Close()
 
 	return user, nil
 }
