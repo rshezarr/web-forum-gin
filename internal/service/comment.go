@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+	"fmt"
 	"forum/internal/model"
 	"forum/internal/repository"
 )
@@ -22,8 +24,26 @@ func NewComment(repo repository.Comment) *CommentService {
 	}
 }
 
+var ErrInvalidComment = errors.New("invalid comment content")
+
+func checkComment(comment model.Comment) error {
+	if comment.Content == "" {
+		return fmt.Errorf("service: create comment: check comment: %w", ErrInvalidComment)
+	}
+	return nil
+}
+
 func (s *CommentService) Create(comment model.Comment) (int, error) {
-	panic("not implemented") // TODO: Implement
+	if err := checkComment(comment); err != nil {
+		return 0, err
+	}
+
+	id, err := s.repo.Create(comment)
+	if err != nil {
+		return 0, fmt.Errorf("service: create comment: check comment: %w", err)
+	}
+
+	return id, nil
 }
 
 func (s *CommentService) GetByPostID(postId int) (model.Comment, error) {
