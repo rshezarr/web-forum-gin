@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"errors"
 	"forum/internal/model"
+	"forum/internal/service"
 	"net/http"
 	"strconv"
 	"time"
@@ -42,6 +44,13 @@ func (h *Handler) createPost(c *gin.Context) {
 
 	id, err := h.service.Post.Create(post)
 	if err != nil {
+		if errors.Is(err, service.ErrInvalidPostTitle) ||
+			errors.Is(err, service.ErrInvalidPostContent) ||
+			errors.Is(err, service.ErrPostTitleLen) ||
+			errors.Is(err, service.ErrPostContentLen) {
+			newErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
