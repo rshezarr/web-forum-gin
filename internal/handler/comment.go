@@ -89,7 +89,7 @@ func (h *Handler) updateComment(c *gin.Context) {
 	}
 
 	newComment.UserID = userId
-	updId, err := h.service.Comment.Update(newComment.Content, id)
+	updId, err := h.service.Comment.Update(newComment, id)
 	if err != nil {
 		if errors.Is(err, service.ErrInvalidComment) {
 			newErrorResponse(c, http.StatusBadRequest, err.Error())
