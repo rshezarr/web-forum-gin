@@ -11,7 +11,7 @@ type Comment interface {
 	Create(comment model.Comment) (int, error)
 	GetByPostID(postId int) ([]model.Comment, error)
 	Update(newComment string, id int) (int, error)
-	Delete(id int) error
+	Delete(id, userId int) error
 }
 
 var ErrInvalidComment = errors.New("invalid comment content")
@@ -68,8 +68,8 @@ func (s *CommentService) Update(newComment string, id int) (int, error) {
 	return commentId, nil
 }
 
-func (s *CommentService) Delete(id int) error {
-	if err := s.repo.Delete(id); err != nil {
+func (s *CommentService) Delete(id, userId int) error {
+	if err := s.repo.Delete(id, userId); err != nil {
 		return fmt.Errorf("service: delete: %w", err)
 	}
 	return nil
