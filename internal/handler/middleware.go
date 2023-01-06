@@ -1,31 +1,54 @@
 package handler
 
 import (
-	"context"
+	"errors"
 	"net/http"
+	"strings"
 
-	"github.com/sirupsen/logrus"
+	"github.com/gin-gonic/gin"
 )
 
-const ctxKeyUser ctxKey = iota
+const userCtx = "user_id"
 
-type ctxKey int8
-
-func (h *Handler) authMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("session_token")
-		if err != nil {
-			logrus.Errorf("cookie: %s", err.Error())
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+func (h *Handler) authMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.Request.Header.Get("Authorization")
+		if authHeader == "" {
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
-		userID, err := h.service.ParseToken(cookie.Value)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		headerParts := strings.Split(authHeader, " ")
+		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
-		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, userID)))
-	})
+		if len(headerParts[1]) == 0 {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		userID, err := h.service.ParseToken(headerParts[1])
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		c.Set(userCtx, userID)
+	}
+}
+
+func getUserId(c *gin.Context) (int, error) {
+	id, ok := c.Get(userCtx)
+	if !ok {
+		return 0, errors.New("user id not found")
+	}
+
+	idInt, ok := id.(int)
+	if !ok {
+		return 0, errors.New("user id is of invalid type")
+	}
+
+	return idInt, nil
 }
