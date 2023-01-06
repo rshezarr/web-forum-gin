@@ -40,8 +40,26 @@ func (h *Handler) createComment(c *gin.Context) {
 	})
 }
 
-func (h *Handler) getComment(c *gin.Context) {
+type getCommentResponse struct {
+	Data []model.Comment `json:"data"`
+}
 
+func (h *Handler) getComment(c *gin.Context) {
+	postId, err := strconv.Atoi(c.Param("post_id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "invalid id param")
+		return
+	}
+
+	comments, err := h.service.Comment.GetByPostID(postId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "invalid id param")
+		return
+	}
+
+	c.JSON(http.StatusOK, getCommentResponse{
+		Data: comments,
+	})
 }
 
 func (h *Handler) updateComment(c *gin.Context) {
