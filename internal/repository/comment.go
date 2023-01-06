@@ -104,17 +104,17 @@ func (r *CommentRepository) GetByPostID(postId int) ([]model.Comment, error) {
 	return comments, nil
 }
 
-func (r *CommentRepository) Update(newComment string, id int) (int, error) {
+func (r *CommentRepository) Update(newComment model.Comment, id int) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
-	stmt, err := r.db.Preparex(`UPDATE commentaries SET content = $1 WHERE id = $2 RETURNING id;`)
+	stmt, err := r.db.Preparex(`UPDATE commentaries SET content = $1 WHERE id = $2 AND user_id = $3 RETURNING id;`)
 	if err != nil {
 		return 0, fmt.Errorf("repo: update comment: prepare - %w", err)
 	}
 
 	var commentId int
-	if err := stmt.GetContext(ctx, &commentId, newComment, id); err != nil {
+	if err := stmt.GetContext(ctx, &commentId, newComment.Content, newComment.UserID); err != nil {
 		return 0, fmt.Errorf("repo: update comment: get - %w", err)
 	}
 
@@ -123,16 +123,16 @@ func (r *CommentRepository) Update(newComment string, id int) (int, error) {
 	return commentId, nil
 }
 
-func (r *CommentRepository) Delete(id int) error {
+func (r *CommentRepository) Delete(id, userId int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
-	stmt, err := r.db.Preparex(`DELETE FROM commentaries WHERE id = $1;`)
+	stmt, err := r.db.Preparex(`DELETE FROM commentaries WHERE id = $1 AND user_id = $2;`)
 	if err != nil {
 		return fmt.Errorf("repo: update comment: prepare - %w", err)
 	}
 
-	_, err = stmt.ExecContext(ctx, id)
+	_, err = stmt.ExecContext(ctx, id, userId)
 	if err != nil {
 		return fmt.Errorf("repo: update comment: exec - %w", err)
 	}
