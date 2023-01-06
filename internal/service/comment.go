@@ -26,15 +26,15 @@ func NewComment(repo repository.Comment) *CommentService {
 	}
 }
 
-func checkComment(comment model.Comment) error {
-	if comment.Content == "" {
+func checkComment(comment string) error {
+	if comment == "" {
 		return fmt.Errorf("service: create comment: check comment: %w", ErrInvalidComment)
 	}
 	return nil
 }
 
 func (s *CommentService) Create(comment model.Comment) (int, error) {
-	if err := checkComment(comment); err != nil {
+	if err := checkComment(comment.Content); err != nil {
 		return 0, err
 	}
 
@@ -56,7 +56,16 @@ func (s *CommentService) GetByPostID(postId int) ([]model.Comment, error) {
 }
 
 func (s *CommentService) Update(newComment string, id int) (int, error) {
-	panic("not implemented") // TODO: Implement
+	if err := checkComment(newComment); err != nil {
+		return 0, err
+	}
+
+	commentId, err := s.repo.Update(newComment, id)
+	if err != nil {
+		return 0, fmt.Errorf("service: update: %w", err)
+	}
+
+	return commentId, nil
 }
 
 func (s *CommentService) Delete(id int) error {
