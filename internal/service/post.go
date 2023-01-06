@@ -59,7 +59,7 @@ func (s *PostService) CreatePost(post model.Post) (int, error) {
 		return 0, err
 	}
 
-	id, err := s.repo.CreatePost(post)
+	id, err := s.repo.Create(post)
 	if err != nil {
 		return 0, fmt.Errorf("service: create post: %w", err)
 	}
@@ -68,7 +68,7 @@ func (s *PostService) CreatePost(post model.Post) (int, error) {
 }
 
 func (s *PostService) UpdatePost(newPost model.Post) (int, error) {
-	id, err := s.repo.UpdatePost(newPost)
+	id, err := s.repo.Update(newPost)
 	if err != nil {
 		return 0, fmt.Errorf("service: update post: %w", err)
 	}
@@ -77,7 +77,7 @@ func (s *PostService) UpdatePost(newPost model.Post) (int, error) {
 }
 
 func (s *PostService) DeletePost(postId int) error {
-	if err := s.repo.DeletePost(postId); err != nil {
+	if err := s.repo.Delete(postId); err != nil {
 		return fmt.Errorf("service: delete post: %w", err)
 	}
 
@@ -85,7 +85,7 @@ func (s *PostService) DeletePost(postId int) error {
 }
 
 func (s *PostService) GetPostByID(postId int) (model.Post, error) {
-	post, err := s.repo.GetPostByID(postId)
+	post, err := s.repo.GetByID(postId)
 	if err != nil {
 		return model.Post{}, fmt.Errorf("service: get post by id: %w", err)
 	}
@@ -94,7 +94,7 @@ func (s *PostService) GetPostByID(postId int) (model.Post, error) {
 }
 
 func (s *PostService) GetAllPosts() ([]model.Post, error) {
-	allPosts, err := s.repo.GetAllPosts()
+	allPosts, err := s.repo.GetAll()
 	if err != nil {
 		return nil, fmt.Errorf("service: get all posts: %w", err)
 	}
