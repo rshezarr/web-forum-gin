@@ -14,7 +14,7 @@ type getAllPostsResponse struct {
 }
 
 func (h *Handler) posts(c *gin.Context) {
-	posts, err := h.service.Post.GetAllPosts()
+	posts, err := h.service.Post.GetAll()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
@@ -40,7 +40,7 @@ func (h *Handler) createPost(c *gin.Context) {
 	post.UserID = userId
 	post.CreationTime = time.Now()
 
-	id, err := h.service.CreatePost(post)
+	id, err := h.service.Post.Create(post)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -74,7 +74,7 @@ func (h *Handler) updatePost(c *gin.Context) {
 		return
 	}
 
-	id, err := h.service.Post.UpdatePost(newPost)
+	id, err := h.service.Post.Update(newPost)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -92,7 +92,7 @@ func (h *Handler) deletePost(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.Post.DeletePost(postId); err != nil {
+	if err := h.service.Post.Delete(postId); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
