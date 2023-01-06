@@ -31,12 +31,12 @@ func (r *CommentRepository) CreateCommentary(comment model.Comment) (int, error)
 
 	stmt, err := r.db.Preparex(`INSERT INTO commentaries (content, user_id, post_id) VALUES ($1, $2, $3) RETURNING id;`)
 	if err != nil {
-		return 0, fmt.Errorf("repo: create post: first query: prepare - %w", err)
+		return 0, fmt.Errorf("repo: create comment: prepare - %w", err)
 	}
 
 	var commentID int
 	if err := stmt.GetContext(ctx, &commentID, comment.Content, comment.UserID, comment.PostID); err != nil {
-		return 0, fmt.Errorf("repo: create post: first query: get - %w", err)
+		return 0, fmt.Errorf("repo: create comment: get - %w", err)
 	}
 
 	defer stmt.Close()
@@ -45,7 +45,20 @@ func (r *CommentRepository) CreateCommentary(comment model.Comment) (int, error)
 }
 
 func (r *CommentRepository) GetCommentaryByID(id int) (model.Comment, error) {
-	panic("not implemented") // TODO: Implement
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
+	defer cancel()
+
+	stmt, err := r.db.Preparex(`SELECT id, user_id, post_id, content FROM commentaries WHERE id = $1;`)
+	if err != nil {
+		return model.Comment{}, fmt.Errorf("repo: get comment by id: prepare - %w", err)
+	}
+
+	var comment model.Comment
+	if err := stmt.GetContext(ctx, &comment); err != nil {
+		return model.Comment{}, fmt.Errorf("repo: get comment by id: prepare - %w", err)
+	}
+
+	return comment, nil
 }
 
 func (r *CommentRepository) GetCommentariesByPostID(postId int) ([]model.Comment, error) {
