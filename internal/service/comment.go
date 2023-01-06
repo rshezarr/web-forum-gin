@@ -10,7 +10,7 @@ import (
 type Comment interface {
 	Create(comment model.Comment) (int, error)
 	GetByPostID(postId int) ([]model.Comment, error)
-	Update(newComment string, id int) (int, error)
+	Update(newComment model.Comment, id int) (int, error)
 	Delete(id, userId int) error
 }
 
@@ -55,8 +55,8 @@ func (s *CommentService) GetByPostID(postId int) ([]model.Comment, error) {
 	return comment, nil
 }
 
-func (s *CommentService) Update(newComment string, id int) (int, error) {
-	if err := checkComment(newComment); err != nil {
+func (s *CommentService) Update(newComment model.Comment, id int) (int, error) {
+	if err := checkComment(newComment.Content); err != nil {
 		return 0, err
 	}
 
