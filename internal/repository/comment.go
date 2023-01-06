@@ -122,5 +122,20 @@ func (r *CommentRepository) Update(newComment string, id int) (int, error) {
 }
 
 func (r *CommentRepository) Delete(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
+	defer cancel()
+
+	stmt, err := r.db.Preparex(`DELETE FROM commentaries WHERE id = $1;`)
+	if err != nil {
+		return fmt.Errorf("repo: update comment: prepare - %w", err)
+	}
+
+	_, err = stmt.ExecContext(ctx, id)
+	if err != nil {
+		return fmt.Errorf("repo: update comment: prepare - %w", err)
+	}
+
+	defer stmt.Close()
+
 	return nil
 }
