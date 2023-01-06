@@ -91,5 +91,16 @@ func (h *Handler) updateComment(c *gin.Context) {
 }
 
 func (h *Handler) deleteComment(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("comment_id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "invalid id param")
+		return
+	}
 
+	if err := h.service.Comment.Delete(id); err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
