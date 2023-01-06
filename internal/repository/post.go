@@ -77,7 +77,7 @@ func (r *PostRepository) GetByID(id int) (model.Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
-	stmt, err := r.db.Preparex(`SELECT id, user_id, title, content, creation_time, likes, dislikes FROM posts WHERE id = $1;`)
+	stmt, err := r.db.Preparex(`SELECT id, user_id, title, content, creation_time FROM posts WHERE id = $1;`)
 	if err != nil {
 		return model.Post{}, fmt.Errorf("repo: get post by id: prepare - %w", err)
 	}
@@ -175,7 +175,7 @@ func (r *PostRepository) GetAll() ([]model.Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
-	stmt, err := r.db.Preparex(`SELECT id, user_id, title, content, creation_time, likes, dislikes FROM posts;`)
+	stmt, err := r.db.Preparex(`SELECT id, user_id, title, content, creation_time FROM posts;`)
 	if err != nil {
 		return nil, fmt.Errorf("repo: get all posts: prepare - %w", err)
 	}
