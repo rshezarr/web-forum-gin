@@ -31,8 +31,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			post.POST("/create", h.createPost)
 			post.PUT("/update/:post_id", h.updatePost)
 			post.DELETE("/delete/:post_id", h.deletePost)
-			// post.POST("/like/:post_id", h.likePost)
-			// post.POST("/dislike/:post_id", h.dislikePost)
 		}
 	}
 	return router
