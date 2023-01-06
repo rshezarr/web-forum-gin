@@ -106,7 +106,7 @@ func (r *CommentRepository) Update(newComment string, id int) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
-	stmt, err := r.db.Preparex(`UPDATE commentaries SET content = $1 WHERE id = $2;`)
+	stmt, err := r.db.Preparex(`UPDATE commentaries SET content = $1 WHERE id = $2 RETURNING id;`)
 	if err != nil {
 		return 0, fmt.Errorf("repo: update comment: prepare - %w", err)
 	}
