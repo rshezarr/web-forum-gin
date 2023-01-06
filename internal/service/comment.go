@@ -9,10 +9,12 @@ import (
 
 type Comment interface {
 	Create(comment model.Comment) (int, error)
-	GetByPostID(postId int) (model.Comment, error)
+	GetByPostID(postId int) ([]model.Comment, error)
 	Update(newComment string, id int) (int, error)
 	Delete(id int) error
 }
+
+var ErrInvalidComment = errors.New("invalid comment content")
 
 type CommentService struct {
 	repo repository.Comment
@@ -23,8 +25,6 @@ func NewComment(repo repository.Comment) *CommentService {
 		repo: repo,
 	}
 }
-
-var ErrInvalidComment = errors.New("invalid comment content")
 
 func checkComment(comment model.Comment) error {
 	if comment.Content == "" {
@@ -46,8 +46,13 @@ func (s *CommentService) Create(comment model.Comment) (int, error) {
 	return id, nil
 }
 
-func (s *CommentService) GetByPostID(postId int) (model.Comment, error) {
-	panic("not implemented") // TODO: Implement
+func (s *CommentService) GetByPostID(postId int) ([]model.Comment, error) {
+	comment, err := s.repo.GetByPostID(postId)
+	if err != nil {
+		return nil, fmt.Errorf("service: get comment: %w", err)
+	}
+
+	return comment, nil
 }
 
 func (s *CommentService) Update(newComment string, id int) (int, error) {
