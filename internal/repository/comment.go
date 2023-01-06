@@ -10,9 +10,10 @@ import (
 )
 
 type Comment interface {
-	CreateCommentary(comment model.Comment) error
-	GetCommentaryByID(id int) (model.Comment, error)
-	GetCommentariesByPostID(postId int) ([]model.Comment, error)
+	Create(comment model.Comment) error
+	GetByID(id int) (model.Comment, error)
+	GetByUserID(userId int) ([]model.Comment, error)
+	GetByPostID(postId int) ([]model.Comment, error)
 }
 
 type CommentRepository struct {
@@ -25,7 +26,7 @@ func NewComment(db *sqlx.DB) *CommentRepository {
 	}
 }
 
-func (r *CommentRepository) CreateCommentary(comment model.Comment) (int, error) {
+func (r *CommentRepository) Create(comment model.Comment) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
