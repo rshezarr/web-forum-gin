@@ -61,6 +61,8 @@ func (r *CommentRepository) GetByID(id int) (model.Comment, error) {
 		return model.Comment{}, fmt.Errorf("repo: get comment by id: prepare - %w", err)
 	}
 
+	defer stmt.Close()
+
 	return comment, nil
 }
 
