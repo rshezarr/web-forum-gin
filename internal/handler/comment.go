@@ -53,7 +53,7 @@ func (h *Handler) getComment(c *gin.Context) {
 
 	comments, err := h.service.Comment.GetByPostID(postId)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, "invalid id param")
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -63,7 +63,31 @@ func (h *Handler) getComment(c *gin.Context) {
 }
 
 func (h *Handler) updateComment(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("comment_id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "invalid id param")
+		return
+	}
 
+	var newComment model.Comment
+	if err := c.BindJSON(&newComment); err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	updId, err := h.service.Comment.Update(newComment.Content, id)
+	if err != nil {
+		if errors.Is(err, service.ErrInvalidComment) {
+			newErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"id": updId,
+	})
 }
 
 func (h *Handler) deleteComment(c *gin.Context) {
