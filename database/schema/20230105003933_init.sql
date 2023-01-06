@@ -14,8 +14,6 @@ CREATE TABLE IF NOT EXISTS posts (
 	title VARCHAR(100) NOT NULL,
 	content TEXT NOT NULL,
 	creation_time TIMESTAMP NOT NULL,
-	likes INTEGER DEFAULT 0,
-	dislikes INTEGER DEFAULT 0,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -24,19 +22,8 @@ CREATE TABLE IF NOT EXISTS commentaries (
 	user_id INTEGER NOT NULL,
 	post_id INTEGER NOT NULL,
 	content TEXT NOT NULL,
-	likes INTEGER DEFAULT 0,
-	dislikes INTEGER DEFAULT 0,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS votes (
-    user_id INTEGER NOT NULL,
-	content_type VARCHAR(10) NOT NULL,
-  	content_id INTEGER NOT NULL,
-  	is_like BOOLEAN NOT NULL DEFAULT FALSE,
-  	is_dislike BOOLEAN NOT NULL DEFAULT FALSE,
-  	PRIMARY KEY (user_id, content_type, content_id)
 );
 -- +goose StatementEnd
 
