@@ -15,7 +15,7 @@ type Comment interface {
 	GetByUserID(userId int) ([]model.Comment, error)
 	GetByPostID(postId int) ([]model.Comment, error)
 	Update(newComment string, id int) (int, error)
-	Delete(id int) error
+	Delete(id, userId int) error
 }
 
 type CommentRepository struct {
