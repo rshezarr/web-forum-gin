@@ -21,3 +21,15 @@ func NewComment(db *sqlx.DB) *CommentRepository {
 		db: db,
 	}
 }
+
+func (r *CommentRepository) CreateCommentary(comment model.Comment) error {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *CommentRepository) GetCommentaryByID(id int) (model.Comment, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (r *CommentRepository) GetCommentariesByPostID(postId int) ([]model.Comment, error) {
+	panic("not implemented") // TODO: Implement
+}
