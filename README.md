@@ -5,9 +5,8 @@
 Web Forum consists in creating a web forum that allows:
 
 -   communication between users
--   associating categories to posts
--   liking and disliking posts and comments
--   filtering posts
+-   crud for posts
+-   commenting on the posts
 
 ## Usage
 
