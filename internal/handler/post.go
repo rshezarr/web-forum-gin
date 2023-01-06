@@ -10,7 +10,7 @@ import (
 )
 
 type getAllPostsResponse struct {
-	Data []model.Post `json:data`
+	Data []model.Post `json:"data"`
 }
 
 func (h *Handler) posts(c *gin.Context) {
@@ -58,7 +58,7 @@ func (h *Handler) updatePost(c *gin.Context) {
 		return
 	}
 
-	postId, err := strconv.Atoi(c.Param("id"))
+	postId, err := strconv.Atoi(c.Param("post_id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
 		return
@@ -86,7 +86,7 @@ func (h *Handler) updatePost(c *gin.Context) {
 }
 
 func (h *Handler) deletePost(c *gin.Context) {
-	postId, err := strconv.Atoi(c.Param("id"))
+	postId, err := strconv.Atoi(c.Param("post_id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
 		return
@@ -96,12 +96,4 @@ func (h *Handler) deletePost(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-}
-
-func (h *Handler) likePost(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func (h *Handler) dislikePost(w http.ResponseWriter, r *http.Request) {
-
 }

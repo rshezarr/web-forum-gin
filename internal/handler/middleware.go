@@ -11,7 +11,7 @@ import (
 const userCtx = "user_id"
 
 func (h *Handler) authMiddleware(c *gin.Context) {
-	authHeader := c.Request.Header.Get("Authorization")
+	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
 		newErrorResponse(c, http.StatusUnauthorized, "empty auth header")
 		return
