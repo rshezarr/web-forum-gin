@@ -1,80 +1,47 @@
 package handler
 
 import (
-	"encoding/json"
 	"forum/internal/model"
-	"io"
 	"net/http"
-	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) signUp(c *gin.Context) {
 	var user model.User
 
-	data, err := io.ReadAll(r.Body)
-	if err != nil {
-		logrus.Errorf("sign up: new decode - %s", err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	if err := json.Unmarshal(data, &user); err != nil {
-		logrus.Errorf("sign up: unmarshal - %s", err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	if err := c.BindJSON(&user); err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	id, err := h.service.User.CreateUser(user)
 	if err != nil {
-		logrus.Errorf("sign up: create user - %s", err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(&id); err != nil {
-		logrus.Errorf("sign up: response id - %s", err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"user_id": id,
+	})
+
 }
 
-func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) signIn(c *gin.Context) {
 	var user model.User
 
-	data, err := io.ReadAll(r.Body)
-	if err != nil {
-		logrus.Errorf("sign in: new decode - %s", err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	if err := json.Unmarshal(data, &user); err != nil {
-		logrus.Errorf("sign in: unmarshal - %s", err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	if err := c.BindJSON(&user); err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	token, err := h.service.GenerateToken(user.Email, user.Password)
 	if err != nil {
-		logrus.Errorf("sign in: generate token - %s", err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    token,
-		Expires:  time.Now().Add(12 * time.Hour),
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   true,
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"token": token,
 	})
-
-	if err := json.NewEncoder(w).Encode(&token); err != nil {
-		logrus.Errorf("sign in: response id - %s", err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
 }
