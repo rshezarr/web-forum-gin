@@ -32,6 +32,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			post.PUT("/update/:post_id", h.updatePost)
 			post.DELETE("/delete/:post_id", h.deletePost)
 		}
+
+		comment := api.Group("/comment")
+		{
+			comment.GET("/:post_id", h.getComment)
+			comment.POST("/create/:post_id", h.createComment)
+			comment.PUT("/update/:post_id", h.updateComment)
+			comment.DELETE("/delete/:post_id", h.deleteComment)
+		}
 	}
 	return router
 }
