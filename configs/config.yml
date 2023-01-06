@@ -2,8 +2,8 @@ api:
     host: "localhost"
     addr: ":9090"
     maxHeaderByte: 1
-    readTimeout: 10
-    writeTimeout: 10
+    readTimeout: 10s
+    writeTimeout: 10s
 
 database:
     databaseUrl: "host=0.0.0.0 port=5432 user=postgres dbname=postgres password=qwerty sslmode=disable"

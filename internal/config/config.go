@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -12,11 +14,11 @@ type (
 	}
 
 	API struct {
-		Host           string `mapstructure:"host"`
-		Addr           string `mapstructure:"addr"`
-		MaxHeaderBytes int    `mapstructure:"maxHeaderByte"`
-		ReadTimeout    int    `mapstructure:"readTimeout"`
-		WriteTimeout   int    `mapstructure:"writeTimeout"`
+		Host           string        `mapstructure:"host"`
+		Addr           string        `mapstructure:"addr"`
+		MaxHeaderBytes int           `mapstructure:"maxHeaderByte"`
+		ReadTimeout    time.Duration `mapstructure:"readTimeout"`
+		WriteTimeout   time.Duration `mapstructure:"writeTimeout"`
 	}
 
 	Database struct {

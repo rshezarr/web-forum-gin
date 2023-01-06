@@ -4,7 +4,6 @@ import (
 	"context"
 	"forum/internal/config"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -20,8 +19,8 @@ func NewServer(cfg *config.Config, router *gin.Engine) *Server {
 			Addr:           cfg.API.Addr,
 			Handler:        router,
 			MaxHeaderBytes: cfg.API.MaxHeaderBytes << 20,
-			ReadTimeout:    time.Duration(cfg.API.ReadTimeout * int(time.Second)),
-			WriteTimeout:   time.Duration(cfg.API.WriteTimeout * int(time.Second)),
+			ReadTimeout:    cfg.API.ReadTimeout,
+			WriteTimeout:   cfg.API.WriteTimeout,
 		},
 	}
 }
