@@ -58,7 +58,7 @@ func (r *CommentRepository) GetByID(id int) (model.Comment, error) {
 
 	var comment model.Comment
 	if err := stmt.GetContext(ctx, &comment); err != nil {
-		return model.Comment{}, fmt.Errorf("repo: get comment by id: prepare - %w", err)
+		return model.Comment{}, fmt.Errorf("repo: get comment by id: get - %w", err)
 	}
 
 	defer stmt.Close()
@@ -77,7 +77,7 @@ func (r *CommentRepository) GetByUserID(userId int) ([]model.Comment, error) {
 
 	var comments []model.Comment
 	if err := stmt.SelectContext(ctx, &comments); err != nil {
-		return nil, fmt.Errorf("repo: get comment by id: prepare - %w", err)
+		return nil, fmt.Errorf("repo: get comment by id: select - %w", err)
 	}
 
 	defer stmt.Close()
@@ -89,14 +89,14 @@ func (r *CommentRepository) GetByPostID(postId int) ([]model.Comment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
-	stmt, err := r.db.Preparex(`SELECT id, user_id, post_id, content FROM commentaries WHERE user_id = $1;`)
+	stmt, err := r.db.Preparex(`SELECT id, user_id, post_id, content FROM commentaries WHERE post_id = $1;`)
 	if err != nil {
 		return nil, fmt.Errorf("repo: get comment by id: prepare - %w", err)
 	}
 
 	var comments []model.Comment
 	if err := stmt.SelectContext(ctx, &comments); err != nil {
-		return nil, fmt.Errorf("repo: get comment by id: prepare - %w", err)
+		return nil, fmt.Errorf("repo: get comment by id: select - %w", err)
 	}
 
 	defer stmt.Close()
@@ -115,7 +115,7 @@ func (r *CommentRepository) Update(newComment string, id int) (int, error) {
 
 	var commentId int
 	if err := stmt.GetContext(ctx, &commentId, newComment, id); err != nil {
-		return 0, fmt.Errorf("repo: update comment: prepare - %w", err)
+		return 0, fmt.Errorf("repo: update comment: get - %w", err)
 	}
 
 	defer stmt.Close()
@@ -134,7 +134,7 @@ func (r *CommentRepository) Delete(id int) error {
 
 	_, err = stmt.ExecContext(ctx, id)
 	if err != nil {
-		return fmt.Errorf("repo: update comment: prepare - %w", err)
+		return fmt.Errorf("repo: update comment: exec - %w", err)
 	}
 
 	defer stmt.Close()
