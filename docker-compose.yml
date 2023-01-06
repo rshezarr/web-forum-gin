@@ -2,7 +2,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:13-alpine
-    container_name: forum
+    container_name: web_forum_db
     restart: always
     ports: 
       - "5432:5432"

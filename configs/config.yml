@@ -6,7 +6,7 @@ api:
     writeTimeout: 10s
 
 database:
-    databaseUrl: "host=0.0.0.0 port=5432 user=postgres dbname=postgres password=qwerty sslmode=disable"
+    databaseUrl: "host=web_forum_db port=5432 user=postgres dbname=postgres password=qwerty sslmode=disable"
     driver: "postgres"
     dbname: "forum"
     schemesPath: "./database/schema/"
