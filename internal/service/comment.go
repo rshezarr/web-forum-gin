@@ -69,5 +69,5 @@ func (s *CommentService) Update(newComment string, id int) (int, error) {
 }
 
 func (s *CommentService) Delete(id int) error {
-	panic("not implemented") // TODO: Implement
+	return fmt.Errorf("service: delete: %w", s.repo.Delete(id))
 }
