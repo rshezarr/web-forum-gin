@@ -21,3 +21,19 @@ func NewComment(repo repository.Comment) *CommentService {
 		repo: repo,
 	}
 }
+
+func (s *CommentService) Create(comment model.Comment) (int, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (s *CommentService) GetByPostID(postId int) (model.Comment, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (s *CommentService) Update(newComment string, id int) (int, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (s *CommentService) Delete(id int) error {
+	panic("not implemented") // TODO: Implement
+}
