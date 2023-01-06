@@ -44,11 +44,11 @@ func (r *CommentRepository) CreateCommentary(comment model.Comment) (int, error)
 	return commentID, nil
 }
 
-func (r *CommentRepository) GetCommentaryByID(id int) (model.Comment, error) {
+func (r *CommentRepository) GetByUserID(userId int) (model.Comment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
-	stmt, err := r.db.Preparex(`SELECT id, user_id, post_id, content FROM commentaries WHERE id = $1;`)
+	stmt, err := r.db.Preparex(`SELECT id, user_id, post_id, content FROM commentaries WHERE user_id = $1;`)
 	if err != nil {
 		return model.Comment{}, fmt.Errorf("repo: get comment by id: prepare - %w", err)
 	}
@@ -61,6 +61,6 @@ func (r *CommentRepository) GetCommentaryByID(id int) (model.Comment, error) {
 	return comment, nil
 }
 
-func (r *CommentRepository) GetCommentariesByPostID(postId int) ([]model.Comment, error) {
+func (r *CommentRepository) GetByPostID(postId int) ([]model.Comment, error) {
 	panic("not implemented") // TODO: Implement
 }
