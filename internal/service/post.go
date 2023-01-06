@@ -17,11 +17,11 @@ var (
 )
 
 type Post interface {
-	CreatePost(post model.Post) (int, error)
-	GetPostByID(postId int) (model.Post, error)
-	UpdatePost(newPost model.Post) (int, error)
-	DeletePost(postId int) error
-	GetAllPosts() ([]model.Post, error)
+	Create(post model.Post) (int, error)
+	GetByID(postId int) (model.Post, error)
+	Update(newPost model.Post) (int, error)
+	Delete(postId int) error
+	GetAll() ([]model.Post, error)
 }
 
 type PostService struct {
