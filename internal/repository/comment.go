@@ -14,6 +14,8 @@ type Comment interface {
 	GetByID(id int) (model.Comment, error)
 	GetByUserID(userId int) ([]model.Comment, error)
 	GetByPostID(postId int) ([]model.Comment, error)
+	Update(userId int) (int, error)
+	Delete(userId int) error
 }
 
 type CommentRepository struct {
@@ -94,4 +96,12 @@ func (r *CommentRepository) GetByPostID(postId int) ([]model.Comment, error) {
 	}
 
 	return comments, nil
+}
+
+func (r *CommentRepository) Update(userId int) (int, error) {
+	return 0, nil
+}
+
+func (r *CommentRepository) Delete(userId int) error {
+	return nil
 }
