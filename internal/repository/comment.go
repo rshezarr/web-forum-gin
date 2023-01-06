@@ -14,7 +14,7 @@ type Comment interface {
 	GetByID(id int) (model.Comment, error)
 	GetByUserID(userId int) ([]model.Comment, error)
 	GetByPostID(postId int) ([]model.Comment, error)
-	Update(newComment string, id int) (int, error)
+	Update(newComment model.Comment, id int) (int, error)
 	Delete(id, userId int) error
 }
 
