@@ -68,6 +68,8 @@ func (r *PostRepository) Create(post model.Post) (int, error) {
 		return 0, fmt.Errorf("repo: create post: second query: exec - %w", err)
 	}
 
+	defer stmt.Close()
+
 	return id, tx.Commit()
 }
 
@@ -85,6 +87,8 @@ func (r *PostRepository) GetByID(id int) (model.Post, error) {
 		return model.Post{}, fmt.Errorf("repo: get post by id: get - %w", err)
 	}
 
+	defer stmt.Close()
+
 	return post, nil
 }
 
@@ -101,6 +105,8 @@ func (r *PostRepository) Update(newPost model.Post) (int, error) {
 	if err := stmt.GetContext(ctx, &id, newPost.Title, newPost.Content, newPost.ID); err != nil {
 		return 0, fmt.Errorf("repo: update post: exec - %w", err)
 	}
+
+	defer stmt.Close()
 
 	return id, nil
 }
@@ -130,6 +136,8 @@ func (r *PostRepository) Delete(postId int) error {
 		return fmt.Errorf("repo: delete post: first query: get - %w", err)
 	}
 
+	defer stmt.Close()
+
 	//second query
 	stmt, err = tx.Preparex(`DELETE FROM posts WHERE id = $1;`)
 	if err != nil {
@@ -143,6 +151,8 @@ func (r *PostRepository) Delete(postId int) error {
 		return fmt.Errorf("repo: delete post: second query: exec - %w", err)
 	}
 
+	defer stmt.Close()
+
 	//third query
 	stmt, err = tx.Preparex(`UPDATE users SET posts = posts - 1 WHERE id = $1`)
 	if err != nil {
@@ -155,6 +165,8 @@ func (r *PostRepository) Delete(postId int) error {
 		tx.Rollback()
 		return fmt.Errorf("repo: delete post: third query: exec - %w", err)
 	}
+
+	defer stmt.Close()
 
 	return tx.Commit()
 }
@@ -172,6 +184,8 @@ func (r *PostRepository) GetAll() ([]model.Post, error) {
 	if err := stmt.SelectContext(ctx, &posts); err != nil {
 		return nil, fmt.Errorf("repo: get all posts: select - %w", err)
 	}
+
+	defer stmt.Close()
 
 	return posts, nil
 }
