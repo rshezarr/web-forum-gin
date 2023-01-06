@@ -10,7 +10,7 @@ import (
 )
 
 type Comment interface {
-	Create(comment model.Comment) error
+	Create(comment model.Comment) (int, error)
 	GetByID(id int) (model.Comment, error)
 	GetByUserID(userId int) ([]model.Comment, error)
 	GetByPostID(postId int) ([]model.Comment, error)
