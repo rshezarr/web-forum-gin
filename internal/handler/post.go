@@ -1,46 +1,39 @@
 package handler
 
 import (
-	"encoding/json"
 	"forum/internal/model"
-	"io"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
+	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) posts(w http.ResponseWriter, r *http.Request) {
-	posts, err := h.service.Post.GetAllPosts()
-	if err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	if err := json.NewEncoder(w).Encode(&posts); err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
+type getAllPostsResponse struct {
+	Data []model.Post `json:data`
 }
 
-func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value(ctxKeyUser).(int)
-
-	data, err := io.ReadAll(r.Body)
+func (h *Handler) posts(c *gin.Context) {
+	posts, err := h.service.Post.GetAllPosts()
 	if err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	c.JSON(http.StatusOK, getAllPostsResponse{
+		Data: posts,
+	})
+}
+
+func (h *Handler) createPost(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	var post model.Post
-	if err := json.Unmarshal(data, &post); err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	if err := c.BindJSON(&post); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -49,61 +42,58 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 
 	id, err := h.service.CreatePost(post)
 	if err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(&id); err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"id": id,
+	})
 }
 
-func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value(ctxKeyUser).(int)
-
-	postId, err := strconv.Atoi(mux.Vars(r)["post_id"])
+func (h *Handler) updatePost(c *gin.Context) {
+	userId, err := getUserId(c)
 	if err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	postId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
 		return
 	}
 
 	newPost := model.Post{
-		ID:      postId,
-		UserID:  userId,
-		Title:   r.FormValue("post_title"),
-		Content: r.FormValue("post_content"),
+		ID:     postId,
+		UserID: userId,
+	}
+
+	if err := c.BindJSON(&newPost); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	id, err := h.service.Post.UpdatePost(newPost)
 	if err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(&id); err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"id": id,
+	})
 }
 
-func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
-	postId, err := strconv.Atoi(mux.Vars(r)["post_id"])
+func (h *Handler) deletePost(c *gin.Context) {
+	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
 		return
 	}
 
 	if err := h.service.Post.DeletePost(postId); err != nil {
-		logrus.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 }

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,7 +14,7 @@ type Server struct {
 	server *http.Server
 }
 
-func NewServer(cfg *config.Config, router *mux.Router) *Server {
+func NewServer(cfg *config.Config, router *gin.Engine) *Server {
 	return &Server{
 		server: &http.Server{
 			Addr:           cfg.API.Addr,
