@@ -122,5 +122,7 @@ func (h *Handler) deleteComment(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"info": "content has ben deleted",
+	})
 }

@@ -114,7 +114,7 @@ func (r *CommentRepository) Update(newComment model.Comment, id int) (int, error
 	}
 
 	var commentId int
-	if err := stmt.GetContext(ctx, &commentId, newComment.Content, newComment.UserID); err != nil {
+	if err := stmt.GetContext(ctx, &commentId, newComment.Content, id, newComment.UserID); err != nil {
 		return 0, fmt.Errorf("repo: update comment: get - %w", err)
 	}
 
