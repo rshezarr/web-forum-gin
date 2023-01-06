@@ -22,7 +22,7 @@ type tokenClaims struct {
 	UserId int `json:"user_id"`
 }
 type User interface {
-	CreateUser(user model.User) (int, error)
+	Create(user model.User) (int, error)
 	GenerateToken(email, password string) (string, error)
 	ParseToken(token string) (int, error)
 }
@@ -43,9 +43,9 @@ func generateHashPassword(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
-func (s *UserService) CreateUser(user model.User) (int, error) {
+func (s *UserService) Create(user model.User) (int, error) {
 	user.Password = generateHashPassword(user.Password)
-	id, err := s.repo.CreateUser(user)
+	id, err := s.repo.Create(user)
 	if err != nil {
 		return 0, err
 	}
@@ -54,7 +54,7 @@ func (s *UserService) CreateUser(user model.User) (int, error) {
 }
 
 func (s *UserService) GenerateToken(email string, password string) (string, error) {
-	user, err := s.repo.GetUser(email, generateHashPassword(password))
+	user, err := s.repo.GetBySignIn(email, generateHashPassword(password))
 	if err != nil {
 		return "", fmt.Errorf("service: generate token: get user - %w", err)
 	}
