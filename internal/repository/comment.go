@@ -95,7 +95,7 @@ func (r *CommentRepository) GetByPostID(postId int) ([]model.Comment, error) {
 	}
 
 	var comments []model.Comment
-	if err := stmt.SelectContext(ctx, &comments); err != nil {
+	if err := stmt.SelectContext(ctx, &comments, postId); err != nil {
 		return nil, fmt.Errorf("repo: get comment by id: select - %w", err)
 	}
 

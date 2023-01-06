@@ -11,6 +11,12 @@ import (
 )
 
 func (h *Handler) createComment(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	postId, err := strconv.Atoi(c.Param("post_id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid id param")
@@ -24,6 +30,7 @@ func (h *Handler) createComment(c *gin.Context) {
 	}
 
 	comment.PostID = postId
+	comment.UserID = userId
 
 	id, err := h.service.Comment.Create(comment)
 	if err != nil {
@@ -41,7 +48,7 @@ func (h *Handler) createComment(c *gin.Context) {
 }
 
 type getCommentResponse struct {
-	Data []model.Comment `json:"data"`
+	Data []model.Comment `json:"post_comment"`
 }
 
 func (h *Handler) getComment(c *gin.Context) {

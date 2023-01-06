@@ -69,5 +69,8 @@ func (s *CommentService) Update(newComment string, id int) (int, error) {
 }
 
 func (s *CommentService) Delete(id int) error {
-	return fmt.Errorf("service: delete: %w", s.repo.Delete(id))
+	if err := s.repo.Delete(id); err != nil {
+		return fmt.Errorf("service: delete: %w", err)
+	}
+	return nil
 }
