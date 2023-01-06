@@ -5,7 +5,7 @@ build:
 	./forum
 
 run: 
-	docker compose up --build -d
+	docker-compose build && docker-compose up -d
 
 dbrun:
 	docker run --name=forum -e POSTGRES_PASSWORD='qwerty' -p 5432:5432 -d --rm postgres
