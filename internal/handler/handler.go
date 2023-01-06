@@ -37,8 +37,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			comment.GET("/:post_id", h.getComment)
 			comment.POST("/create/:post_id", h.createComment)
-			comment.PUT("/update/:post_id", h.updateComment)
-			comment.DELETE("/delete/:post_id", h.deleteComment)
+			comment.PUT("/update/:comment_id", h.updateComment)
+			comment.DELETE("/delete/:comment_id", h.deleteComment)
 		}
 	}
 	return router
