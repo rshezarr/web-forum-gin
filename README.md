@@ -21,4 +21,3 @@ $ make run
 -   Go (golang)
 -   Postgres
 -   Docker (docker-compose)
--   Swagger
