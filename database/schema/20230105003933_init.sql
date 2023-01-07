@@ -29,13 +29,7 @@ CREATE TABLE IF NOT EXISTS commentaries (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE likes;
-
-DROP TABLE dislikes;
-
 DROP TABLE commentaries;
-
-DROP TABLE post_category;
 
 DROP TABLE posts;
 
