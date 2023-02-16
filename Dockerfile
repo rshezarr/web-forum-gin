@@ -1,7 +1,8 @@
 FROM golang:1.19-alpine as builder
 WORKDIR /app
 COPY . .
-RUN go build -o web_forum ./cmd/app/main.go
+COPY go.mod .
+RUN go build -o web_forum ./cmd/app/main.go && go mod download
 
 FROM alpine:3.16
 WORKDIR /app
