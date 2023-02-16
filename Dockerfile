@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine as builder
+FROM golang:1.19-alpine AS builder
 WORKDIR /app
 COPY . .
 RUN go mod download && go build -o web_forum ./cmd/app/main.go
