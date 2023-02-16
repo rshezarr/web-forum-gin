@@ -10,6 +10,7 @@ services:
       - POSTGRES_PASSWORD=qwerty
       - POSTGRES_USER=postgres
   api:
+    container_name: web_forum_api
     restart: on-failure
     build: .
     ports:
