@@ -11,5 +11,5 @@ database:
     dbname: "forum"
     schemesPath: "./database/schema/"
     ctxTimeout: 5s
-# Use 'forum' as host if connection through docker compose
+# Use 'web_forum_db' as host if connection through docker compose
 # And 'localhost' or '0.0.0.0' if connection locally
