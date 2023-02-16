@@ -12,4 +12,4 @@ stop-compose:
 	docker-compose down
 
 run-psql:
-	docker run --name=forum -e POSTGRES_PASSWORD='qwerty' -p 5432:5432 -d --rm postgres
+	docker run --name=forum -e POSTGRES_PASSWORD='qwerty' -p 5432:5432 -d --rm postgres:13-alpine
