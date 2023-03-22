@@ -7,7 +7,7 @@ import (
 	"forum/internal/repository"
 	"forum/internal/server"
 	"forum/internal/service"
-	"forum/pkg/database"
+	database "forum/pkg/database/postgres"
 	"os"
 	"os/signal"
 	"syscall"
@@ -21,7 +21,7 @@ func Run() {
 		logrus.Fatal(err)
 	}
 
-	db, _, err := database.DetectDatabase(cfg)
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
 		logrus.Fatal(err)
 	}

@@ -8,23 +8,14 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 	"github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type PostgresConnectionFactory struct {
-	Host         string
-	Port         int
-	DatabaseName string
-	Username     string
-	Password     string
-}
-
-func (p *PostgresConnectionFactory) ConnectDB(cfg *config.Config) (*sqlx.DB, *mongo.Database, error) {
+func ConnectDB(cfg *config.Config) (*sqlx.DB, error) {
 	logrus.Info("Connecting to database...")
 
 	db, err := sqlx.Connect(cfg.Database.Driver, cfg.Database.DatabaseURL)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error while database connection: %w", err)
+		return nil, fmt.Errorf("error while database connection: %w", err)
 	}
 
 	logrus.Info("Creating tables...")
@@ -35,5 +26,5 @@ func (p *PostgresConnectionFactory) ConnectDB(cfg *config.Config) (*sqlx.DB, *mo
 
 	logrus.Info("Tables are created and successful conenction")
 
-	return db, nil, nil
+	return db, nil
 }
