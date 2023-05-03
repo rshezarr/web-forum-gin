@@ -18,6 +18,7 @@ $ make run
 
 ## Tools used in this project
 
--   Go (golang)
+-   Golang
 -   Postgres
 -   Docker (docker-compose)
+-   Redis
