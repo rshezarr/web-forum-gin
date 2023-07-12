@@ -24,7 +24,7 @@ func ConnectDB(cfg *config.Config) (*sqlx.DB, error) {
 		logrus.Fatalf("migration: %s", err.Error())
 	}
 
-	logrus.Info("Tables are created and successful conenction")
+	logrus.Info("Tables are created and successfully connected")
 
 	return db, nil
 }

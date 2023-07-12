@@ -13,7 +13,7 @@ Web Forum consists in creating a web forum that allows:
 To start the application through `docker-compose`
 
 ```
-$ make run
+$ make run-compose
 ```
 
 ## Tools used in this project

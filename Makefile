@@ -4,9 +4,8 @@ build:
 	go build -o forum ./cmd/app/main.go
 	./forum
 
-run-compose: 
-	docker-compose build
-	docker-compose up -d
+run-compose:
+	docker-compose up --build -d
 
 stop-compose:
 	docker-compose down
