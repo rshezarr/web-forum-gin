@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) createComment(c *gin.Context) {
+func (h *Controller) createComment(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -51,7 +51,7 @@ type getCommentResponse struct {
 	Data []model.Comment `json:"post_comment"`
 }
 
-func (h *Handler) getComment(c *gin.Context) {
+func (h *Controller) getComment(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("post_id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid id param")
@@ -69,7 +69,7 @@ func (h *Handler) getComment(c *gin.Context) {
 	})
 }
 
-func (h *Handler) updateComment(c *gin.Context) {
+func (h *Controller) updateComment(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -104,7 +104,7 @@ func (h *Handler) updateComment(c *gin.Context) {
 	})
 }
 
-func (h *Handler) deleteComment(c *gin.Context) {
+func (h *Controller) deleteComment(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())

@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 
 const userCtx = "user_id"
 
-func (h *Handler) authMiddleware(c *gin.Context) {
+func (h *Controller) authMiddleware(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
 		newErrorResponse(c, http.StatusUnauthorized, "empty auth header")

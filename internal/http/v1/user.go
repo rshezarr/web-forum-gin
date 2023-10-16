@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"forum/internal/model"
@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) signUp(c *gin.Context) {
+func (h *Controller) signUp(c *gin.Context) {
 	var user model.User
 
 	if err := c.BindJSON(&user); err != nil {
@@ -27,7 +27,7 @@ func (h *Handler) signUp(c *gin.Context) {
 
 }
 
-func (h *Handler) signIn(c *gin.Context) {
+func (h *Controller) signIn(c *gin.Context) {
 	var user model.User
 
 	if err := c.BindJSON(&user); err != nil {

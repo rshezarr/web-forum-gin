@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ type getAllPostsResponse struct {
 	Data []model.Post `json:"data"`
 }
 
-func (h *Handler) posts(c *gin.Context) {
+func (h *Controller) posts(c *gin.Context) {
 	posts, err := h.service.Post.GetAll()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -26,7 +26,7 @@ func (h *Handler) posts(c *gin.Context) {
 	})
 }
 
-func (h *Handler) createPost(c *gin.Context) {
+func (h *Controller) createPost(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -60,7 +60,7 @@ func (h *Handler) createPost(c *gin.Context) {
 	})
 }
 
-func (h *Handler) updatePost(c *gin.Context) {
+func (h *Controller) updatePost(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -94,7 +94,7 @@ func (h *Handler) updatePost(c *gin.Context) {
 	})
 }
 
-func (h *Handler) deletePost(c *gin.Context) {
+func (h *Controller) deletePost(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("post_id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid id param")

@@ -1,4 +1,4 @@
-package handler
+package v1
 
 import (
 	"forum/internal/service"
@@ -6,24 +6,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Handler struct {
+type Controller struct {
 	service *service.Service
+	handler *gin.Engine
 }
 
-func NewHandler(service *service.Service) *Handler {
-	return &Handler{service: service}
+func NewController(service *service.Service) *Controller {
+	return &Controller{
+		service: service,
+		handler: gin.New(),
+	}
 }
 
-func (h *Handler) InitRoutes() *gin.Engine {
-	router := gin.New()
-
-	auth := router.Group("/user")
+func (h *Controller) InitRoutes() *gin.Engine {
+	auth := h.handler.Group("/user")
 	{
 		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
 	}
 
-	api := router.Group("/api", h.authMiddleware)
+	api := h.handler.Group("/api", h.authMiddleware)
 	{
 		post := api.Group("/post")
 		{
@@ -41,5 +43,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			comment.DELETE("/delete/:comment_id", h.deleteComment)
 		}
 	}
-	return router
+
+	return h.handler
 }

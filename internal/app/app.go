@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 	"forum/internal/config"
-	"forum/internal/handler"
+	"forum/internal/http/v1"
 	"forum/internal/repository"
 	"forum/internal/server"
 	"forum/internal/service"
@@ -28,7 +28,7 @@ func Run() {
 
 	repo := repository.NewRepository(db)
 	svc := service.NewService(repo)
-	ctrl := handler.NewHandler(svc)
+	ctrl := v1.NewController(svc)
 	srv := server.NewServer(cfg, ctrl.InitRoutes())
 
 	quit := make(chan os.Signal, 1)
