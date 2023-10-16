@@ -4,12 +4,14 @@ api:
     maxHeaderByte: 1
     readTimeout: 10s
     writeTimeout: 10s
+    idleTimeout: 60s
 
 database:
-    databaseUrl: "host=web_forum_db port=5432 user=postgres dbname=postgres password=qwerty sslmode=disable"
+    databaseUrl: "host=localhost port=5432 user=postgres dbname=postgres password=qwerty sslmode=disable"
     driver: "postgres"
     dbname: "forum"
     schemesPath: "./database/schema/"
     ctxTimeout: 5s
+    idleTimeout: 30s
 # Use 'web_forum_db' as host if connection through docker compose
 # And 'localhost' or '0.0.0.0' if connection locally

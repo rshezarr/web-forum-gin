@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -8,34 +9,50 @@ import (
 )
 
 type (
-	Config struct {
-		API      API      `mapstructure:"api"`
-		Database Database `mapstructure:"database"`
+	Configuration struct {
+		API      API      `yaml:"api"`
+		Database Database `yaml:"database"`
 	}
 
 	API struct {
-		Host           string        `mapstructure:"host"`
-		Addr           string        `mapstructure:"addr"`
-		MaxHeaderBytes int           `mapstructure:"maxHeaderByte"`
-		ReadTimeout    time.Duration `mapstructure:"readTimeout"`
-		WriteTimeout   time.Duration `mapstructure:"writeTimeout"`
+		Host           string        `yaml:"host"`
+		Addr           string        `yaml:"addr"`
+		MaxHeaderBytes int           `yaml:"maxHeaderByte"`
+		ReadTimeout    time.Duration `yaml:"readTimeout"`
+		WriteTimeout   time.Duration `yaml:"writeTimeout"`
+		IdleTimeout    time.Duration `yaml:"idleTimeout"`
 	}
 
 	Database struct {
-		Driver      string `mapstructure:"driver"`
-		DBName      string `mapstructure:"dbname"`
-		DatabaseURL string `mapstructure:"databaseUrl"`
-		SchemePath  string `mapstructure:"schemesPath"`
+		Driver      string        `yaml:"driver"`
+		DBName      string        `yaml:"dbname"`
+		DatabaseURL string        `yaml:"databaseUrl"`
+		SchemePath  string        `yaml:"schemesPath"`
+		IdleTimeout time.Duration `yaml:"idleTimeout"`
 	}
 )
 
-func NewConfig() (*Config, error) {
-	logrus.Info("Configs are initializing...")
+func initConfig() error {
+	var configPath = flag.String("config-path", "configs/", "path to config file")
 
-	var config *Config
+	flag.Parse()
+
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(*configPath)
+
+	return viper.ReadInConfig()
+}
+
+func NewConfig() (*Configuration, error) {
+	config := new(Configuration)
+
+	if err := initConfig(); err != nil {
+		return nil, err
+	}
 
 	if err := viper.Unmarshal(&config); err != nil {
-		return &Config{}, err
+		return &Configuration{}, err
 	}
 
 	logrus.Info("Configs are initialized")
