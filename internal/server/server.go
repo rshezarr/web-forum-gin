@@ -6,14 +6,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 type Server struct {
-	server *http.Server
+	server          *http.Server
+	ServerErrorChan chan error
 }
 
-func NewServer(cfg *config.Config, router *gin.Engine) *Server {
+func NewServer(cfg *config.Configuration, router *gin.Engine) *Server {
 	return &Server{
 		server: &http.Server{
 			Addr:           cfg.API.Addr,
@@ -21,18 +21,20 @@ func NewServer(cfg *config.Config, router *gin.Engine) *Server {
 			MaxHeaderBytes: cfg.API.MaxHeaderBytes << 20,
 			ReadTimeout:    cfg.API.ReadTimeout,
 			WriteTimeout:   cfg.API.WriteTimeout,
+			IdleTimeout:    cfg.API.IdleTimeout,
 		},
+		ServerErrorChan: make(chan error, 1),
 	}
 }
 
-func (s *Server) Run() error {
-	logrus.Infof("Server is started at port http://localhost%s", s.server.Addr)
-
-	return s.server.ListenAndServe()
+func (s *Server) Run() {
+	s.ServerErrorChan <- s.server.ListenAndServe()
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	logrus.Info("Server shutting down...")
-
 	return s.server.Shutdown(ctx)
+}
+
+func (s *Server) Notify() <-chan error {
+	return s.ServerErrorChan
 }

@@ -26,28 +26,29 @@ func Run() {
 		logrus.Fatal(err)
 	}
 
-	repository := repository.NewRepository(db)
-	service := service.NewService(repository)
-	handler := handler.NewHandler(service)
-	server := server.NewServer(cfg, handler.InitRoutes())
-
-	go func() {
-		logrus.Fatal("error while running server: %s", server.Run().Error())
-	}()
-
-	logrus.Info("Forum app starting...")
+	repo := repository.NewRepository(db)
+	svc := service.NewService(repo)
+	ctrl := handler.NewHandler(svc)
+	srv := server.NewServer(cfg, ctrl.InitRoutes())
 
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
-	<-quit
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT, os.Interrupt)
 
-	logrus.Info("Forum app shutting down...")
+	go func() {
+		logrus.Infof("Server is started at port: %s", cfg.API.Addr)
+		srv.Run()
+	}()
 
-	if err := server.Shutdown(context.Background()); err != nil {
-		logrus.Error("error while server shutting down: %s", err.Error())
+	select {
+	case sig := <-quit:
+		logrus.Info("app: signal accepted: %s", sig.String())
+	case err := <-srv.ServerErrorChan:
+		logrus.Info("app: signal accepted: %s", err.Error())
 	}
 
-	logrus.Info("Closing database...")
+	if err := srv.Shutdown(context.Background()); err != nil {
+		logrus.Error("error while server shutting down: %s", err.Error())
+	}
 
 	if err := db.Close(); err != nil {
 		logrus.Error("error while closing database: %s", err.Error())

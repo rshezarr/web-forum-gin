@@ -10,15 +10,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func ConnectDB(cfg *config.Config) (*sqlx.DB, error) {
-	logrus.Info("Connecting to database...")
-
+func ConnectDB(cfg *config.Configuration) (*sqlx.DB, error) {
 	db, err := sqlx.Connect(cfg.Database.Driver, cfg.Database.DatabaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("error while database connection: %w", err)
 	}
-
-	logrus.Info("Creating tables...")
 
 	if err := goose.Up(db.DB, cfg.Database.SchemePath, goose.WithNoVersioning()); err != nil {
 		logrus.Fatalf("migration: %s", err.Error())
