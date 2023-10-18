@@ -17,17 +17,18 @@ type (
 	API struct {
 		Host           string        `yaml:"host"`
 		Addr           string        `yaml:"addr"`
-		MaxHeaderBytes int           `yaml:"maxHeaderByte"`
+		MaxHeaderBytes int           `yaml:"maxHeaderBytes"`
 		ReadTimeout    time.Duration `yaml:"readTimeout"`
 		WriteTimeout   time.Duration `yaml:"writeTimeout"`
 		IdleTimeout    time.Duration `yaml:"idleTimeout"`
 	}
 
 	Database struct {
+		DatabaseURL string        `yaml:"databaseUrl"`
 		Driver      string        `yaml:"driver"`
 		DBName      string        `yaml:"dbname"`
-		DatabaseURL string        `yaml:"databaseUrl"`
-		SchemePath  string        `yaml:"schemesPath"`
+		SchemesPath string        `yaml:"schemesPath"`
+		CtxTimeout  time.Duration `yaml:"ctxTimeout"`
 		IdleTimeout time.Duration `yaml:"idleTimeout"`
 	}
 )
@@ -38,7 +39,7 @@ func initConfig() error {
 	flag.Parse()
 
 	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
+	viper.SetConfigType("yml")
 	viper.AddConfigPath(*configPath)
 
 	return viper.ReadInConfig()

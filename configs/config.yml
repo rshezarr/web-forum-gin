@@ -1,7 +1,7 @@
 api:
     host: "localhost"
     addr: ":9090"
-    maxHeaderByte: 1
+    maxHeaderBytes: 1
     readTimeout: 10s
     writeTimeout: 10s
     idleTimeout: 60s

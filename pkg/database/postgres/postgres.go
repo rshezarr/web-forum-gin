@@ -15,8 +15,8 @@ func ConnectDB(cfg *config.Configuration) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error while database connection: %w", err)
 	}
-
-	if err := goose.Up(db.DB, cfg.Database.SchemePath, goose.WithNoVersioning()); err != nil {
+	fmt.Println(cfg)
+	if err := goose.Up(db.DB, cfg.Database.SchemesPath, goose.WithNoVersioning()); err != nil {
 		logrus.Fatalf("migration: %s", err.Error())
 	}
 
