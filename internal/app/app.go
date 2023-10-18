@@ -42,7 +42,7 @@ func Run() {
 	select {
 	case sig := <-quit:
 		logrus.Info("app: signal accepted: %s", sig.String())
-	case err := <-srv.ServerErrorChan:
+	case err := <-srv.Notify():
 		logrus.Info("app: signal accepted: %s", err.Error())
 	}
 
