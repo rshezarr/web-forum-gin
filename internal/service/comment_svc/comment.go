@@ -1,13 +1,13 @@
-package service
+package comment_svc
 
 import (
 	"errors"
 	"fmt"
 	"forum/internal/model"
-	"forum/internal/repository"
+	"forum/internal/repository/comment_repo"
 )
 
-type Comment interface {
+type Commenter interface {
 	Create(comment model.Comment) (int, error)
 	GetByPostID(postId int) ([]model.Comment, error)
 	Update(newComment model.Comment, id int) (int, error)
@@ -16,12 +16,12 @@ type Comment interface {
 
 var ErrInvalidComment = errors.New("invalid comment content")
 
-type CommentService struct {
-	repo repository.Comment
+type commentService struct {
+	repo comment_repo.Commenter
 }
 
-func NewComment(repo repository.Comment) *CommentService {
-	return &CommentService{
+func NewComment(repo comment_repo.Commenter) Commenter {
+	return &commentService{
 		repo: repo,
 	}
 }
@@ -33,7 +33,7 @@ func checkComment(comment string) error {
 	return nil
 }
 
-func (s *CommentService) Create(comment model.Comment) (int, error) {
+func (s *commentService) Create(comment model.Comment) (int, error) {
 	if err := checkComment(comment.Content); err != nil {
 		return 0, err
 	}
@@ -46,7 +46,7 @@ func (s *CommentService) Create(comment model.Comment) (int, error) {
 	return id, nil
 }
 
-func (s *CommentService) GetByPostID(postId int) ([]model.Comment, error) {
+func (s *commentService) GetByPostID(postId int) ([]model.Comment, error) {
 	comment, err := s.repo.GetByPostID(postId)
 	if err != nil {
 		return nil, fmt.Errorf("service: get comment: %w", err)
@@ -55,7 +55,7 @@ func (s *CommentService) GetByPostID(postId int) ([]model.Comment, error) {
 	return comment, nil
 }
 
-func (s *CommentService) Update(newComment model.Comment, id int) (int, error) {
+func (s *commentService) Update(newComment model.Comment, id int) (int, error) {
 	if err := checkComment(newComment.Content); err != nil {
 		return 0, err
 	}
@@ -68,7 +68,7 @@ func (s *CommentService) Update(newComment model.Comment, id int) (int, error) {
 	return commentId, nil
 }
 
-func (s *CommentService) Delete(id, userId int) error {
+func (s *commentService) Delete(id, userId int) error {
 	if err := s.repo.Delete(id, userId); err != nil {
 		return fmt.Errorf("service: delete: %w", err)
 	}

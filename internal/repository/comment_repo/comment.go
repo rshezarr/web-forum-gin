@@ -1,4 +1,4 @@
-package repository
+package comment_repo
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Comment interface {
+type Commenter interface {
 	Create(comment model.Comment) (int, error)
 	GetByID(id int) (model.Comment, error)
 	GetByUserID(userId int) ([]model.Comment, error)
@@ -18,17 +18,17 @@ type Comment interface {
 	Delete(id, userId int) error
 }
 
-type CommentRepository struct {
+type commentRepository struct {
 	db *sqlx.DB
 }
 
-func NewComment(db *sqlx.DB) *CommentRepository {
-	return &CommentRepository{
+func NewComment(db *sqlx.DB) Commenter {
+	return &commentRepository{
 		db: db,
 	}
 }
 
-func (r *CommentRepository) Create(comment model.Comment) (int, error) {
+func (r *commentRepository) Create(comment model.Comment) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -47,7 +47,7 @@ func (r *CommentRepository) Create(comment model.Comment) (int, error) {
 	return commentID, nil
 }
 
-func (r *CommentRepository) GetByID(id int) (model.Comment, error) {
+func (r *commentRepository) GetByID(id int) (model.Comment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -66,7 +66,7 @@ func (r *CommentRepository) GetByID(id int) (model.Comment, error) {
 	return comment, nil
 }
 
-func (r *CommentRepository) GetByUserID(userId int) ([]model.Comment, error) {
+func (r *commentRepository) GetByUserID(userId int) ([]model.Comment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -85,7 +85,7 @@ func (r *CommentRepository) GetByUserID(userId int) ([]model.Comment, error) {
 	return comments, nil
 }
 
-func (r *CommentRepository) GetByPostID(postId int) ([]model.Comment, error) {
+func (r *commentRepository) GetByPostID(postId int) ([]model.Comment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -104,7 +104,7 @@ func (r *CommentRepository) GetByPostID(postId int) ([]model.Comment, error) {
 	return comments, nil
 }
 
-func (r *CommentRepository) Update(newComment model.Comment, id int) (int, error) {
+func (r *commentRepository) Update(newComment model.Comment, id int) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -123,7 +123,7 @@ func (r *CommentRepository) Update(newComment model.Comment, id int) (int, error
 	return commentId, nil
 }
 
-func (r *CommentRepository) Delete(id, userId int) error {
+func (r *commentRepository) Delete(id, userId int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 

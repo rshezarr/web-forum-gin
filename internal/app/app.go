@@ -4,6 +4,7 @@ import (
 	"context"
 	"forum/internal/config"
 	"forum/internal/http/v1"
+	"forum/internal/middleware"
 	"forum/internal/repository"
 	"forum/internal/server"
 	"forum/internal/service"
@@ -28,7 +29,9 @@ func Run() {
 
 	repo := repository.NewRepository(db)
 	svc := service.NewService(repo)
-	ctrl := v1.NewController(svc)
+	middle := middleware.NewMiddleware(svc.UserSvcInit())
+	ctrl := v1.NewController(svc, middle)
+	ctrl.StartRoutes()
 	srv := server.NewServer(cfg, ctrl.InitRoutes())
 
 	quit := make(chan os.Signal, 1)

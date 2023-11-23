@@ -1,4 +1,4 @@
-package repository
+package user_repo
 
 import (
 	"context"
@@ -9,23 +9,23 @@ import (
 	"github.com/spf13/viper"
 )
 
-type User interface {
-	Create(user model.User) (int, error)
-	GetByID(userID int) (model.User, error)
-	GetBySignIn(email, hashedPassword string) (model.User, error)
+type Userer interface {
+	Create(user *model.UserEntity) (int, error)
+	GetByID(userID int) (*model.UserEntity, error)
+	GetBySignIn(email, hashedPassword string) (*model.UserEntity, error)
 }
 
-type UserRepository struct {
+type userRepository struct {
 	db *sqlx.DB
 }
 
-func NewUser(db *sqlx.DB) *UserRepository {
-	return &UserRepository{
+func NewUser(db *sqlx.DB) Userer {
+	return &userRepository{
 		db: db,
 	}
 }
 
-func (r *UserRepository) Create(user model.User) (int, error) {
+func (r *userRepository) Create(user *model.UserEntity) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -44,18 +44,18 @@ func (r *UserRepository) Create(user model.User) (int, error) {
 	return id, nil
 }
 
-func (r *UserRepository) GetByID(userID int) (model.User, error) {
+func (r *userRepository) GetByID(userID int) (*model.UserEntity, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
 	stmt, err := r.db.Preparex(`SELECT id, email, username, password FROM users WHERE id = $1;`)
 	if err != nil {
-		return model.User{}, fmt.Errorf("repo: get user: prepare - %w", err)
+		return nil, fmt.Errorf("repo: get user: prepare - %w", err)
 	}
 
-	var user model.User
+	user := new(model.UserEntity)
 	if err := stmt.GetContext(ctx, &user, userID); err != nil {
-		return model.User{}, fmt.Errorf("repo: get user: get - %w", err)
+		return nil, fmt.Errorf("repo: get user: get - %w", err)
 	}
 
 	defer stmt.Close()
@@ -63,18 +63,18 @@ func (r *UserRepository) GetByID(userID int) (model.User, error) {
 	return user, nil
 }
 
-func (r *UserRepository) GetBySignIn(email, hashedPassword string) (model.User, error) {
+func (r *userRepository) GetBySignIn(email, hashedPassword string) (*model.UserEntity, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
 	stmt, err := r.db.Preparex(`SELECT id, email, username, password FROM users WHERE email = $1 AND password = $2;`)
 	if err != nil {
-		return model.User{}, fmt.Errorf("repo: get user: prepare - %w", err)
+		return nil, fmt.Errorf("repo: get user: prepare - %w", err)
 	}
 
-	var user model.User
+	user := new(model.UserEntity)
 	if err := stmt.GetContext(ctx, &user, email, hashedPassword); err != nil {
-		return model.User{}, fmt.Errorf("repo: get user: get - %w", err)
+		return nil, fmt.Errorf("repo: get user: get - %w", err)
 	}
 
 	defer stmt.Close()

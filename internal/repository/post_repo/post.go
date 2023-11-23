@@ -1,4 +1,4 @@
-package repository
+package post_repo
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Post interface {
+type Poster interface {
 	Create(post model.Post) (int, error)
 	GetByID(id int) (model.Post, error)
 	Update(newPost model.Post) (int, error)
@@ -18,17 +18,17 @@ type Post interface {
 	GetAll() ([]model.Post, error)
 }
 
-type PostRepository struct {
+type postRepository struct {
 	db *sqlx.DB
 }
 
-func NewPost(db *sqlx.DB) *PostRepository {
-	return &PostRepository{
+func NewPost(db *sqlx.DB) Poster {
+	return &postRepository{
 		db: db,
 	}
 }
 
-func (r *PostRepository) Create(post model.Post) (int, error) {
+func (r *postRepository) Create(post model.Post) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -73,7 +73,7 @@ func (r *PostRepository) Create(post model.Post) (int, error) {
 	return id, tx.Commit()
 }
 
-func (r *PostRepository) GetByID(id int) (model.Post, error) {
+func (r *postRepository) GetByID(id int) (model.Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -92,7 +92,7 @@ func (r *PostRepository) GetByID(id int) (model.Post, error) {
 	return post, nil
 }
 
-func (r *PostRepository) Update(newPost model.Post) (int, error) {
+func (r *postRepository) Update(newPost model.Post) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -111,7 +111,7 @@ func (r *PostRepository) Update(newPost model.Post) (int, error) {
 	return id, nil
 }
 
-func (r *PostRepository) Delete(postId int) error {
+func (r *postRepository) Delete(postId int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 
@@ -171,7 +171,7 @@ func (r *PostRepository) Delete(postId int) error {
 	return tx.Commit()
 }
 
-func (r *PostRepository) GetAll() ([]model.Post, error) {
+func (r *postRepository) GetAll() ([]model.Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("database.ctxTimeout"))
 	defer cancel()
 

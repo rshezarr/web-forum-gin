@@ -5,7 +5,7 @@ build:
 	./forum
 
 run-compose:
-	docker-compose up --build -d
+	docker-compose up -d --build
 
 stop-compose:
 	docker-compose down

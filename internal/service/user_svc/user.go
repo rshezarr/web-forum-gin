@@ -1,11 +1,12 @@
-package service
+package user_svc
 
 import (
-	"crypto/sha1"
 	"errors"
 	"fmt"
 	"forum/internal/model"
-	"forum/internal/repository"
+	"forum/internal/repository/user_repo"
+	"github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -21,31 +22,35 @@ type tokenClaims struct {
 	jwt.StandardClaims
 	UserId int `json:"user_id"`
 }
-type User interface {
-	Create(user model.User) (int, error)
+
+type Userer interface {
+	Create(user *model.UserDto) (int, error)
 	GenerateToken(email, password string) (string, error)
 	ParseToken(token string) (int, error)
 }
 
-type UserService struct {
-	repo repository.User
+type userService struct {
+	repo user_repo.Userer
 }
 
-func NewUser(repo repository.User) *UserService {
-	return &UserService{
+func NewUser(repo user_repo.Userer) Userer {
+	return &userService{
 		repo: repo,
 	}
 }
 
 func generateHashPassword(password string) string {
-	hash := sha1.New()
-	hash.Write([]byte(password))
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		logrus.Error("error while generation hash: %v", err)
+	}
+
+	return string(hash)
 }
 
-func (s *UserService) Create(user model.User) (int, error) {
+func (s *userService) Create(user *model.UserDto) (int, error) {
 	user.Password = generateHashPassword(user.Password)
-	id, err := s.repo.Create(user)
+	id, err := s.repo.Create(model.UserDtoToEntity(user))
 	if err != nil {
 		return 0, err
 	}
@@ -53,7 +58,7 @@ func (s *UserService) Create(user model.User) (int, error) {
 	return id, nil
 }
 
-func (s *UserService) GenerateToken(email string, password string) (string, error) {
+func (s *userService) GenerateToken(email string, password string) (string, error) {
 	user, err := s.repo.GetBySignIn(email, generateHashPassword(password))
 	if err != nil {
 		return "", fmt.Errorf("service: generate token: get user - %w", err)
@@ -67,15 +72,15 @@ func (s *UserService) GenerateToken(email string, password string) (string, erro
 		user.ID,
 	})
 
-	user.Token, err = token.SignedString([]byte(signingKey))
+	userToken, err := token.SignedString([]byte(signingKey))
 	if err != nil {
 		return "", fmt.Errorf("service: generate token: get string - %w", err)
 	}
 
-	return user.Token, nil
+	return userToken, nil
 }
 
-func (s *UserService) ParseToken(accessToken string) (int, error) {
+func (s *userService) ParseToken(accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
