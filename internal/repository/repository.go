@@ -4,16 +4,17 @@ import (
 	"forum/internal/repository/comment_repo"
 	"forum/internal/repository/post_repo"
 	"forum/internal/repository/user_repo"
+
 	"github.com/jmoiron/sqlx"
 )
 
-type Repositoryer interface {
+type RepoInitializer interface {
 	UserRepoInit() user_repo.Userer
 	PostRepoInit() post_repo.Poster
 	CommentRepoInit() comment_repo.Commenter
 }
 
-type Repository struct {
+type repository struct {
 	db *sqlx.DB
 
 	user    user_repo.Userer
@@ -21,13 +22,13 @@ type Repository struct {
 	comment comment_repo.Commenter
 }
 
-func NewRepository(db *sqlx.DB) Repositoryer {
-	return &Repository{
+func NewRepository(db *sqlx.DB) RepoInitializer {
+	return &repository{
 		db: db,
 	}
 }
 
-func (r *Repository) UserRepoInit() user_repo.Userer {
+func (r *repository) UserRepoInit() user_repo.Userer {
 	if r.user == nil {
 		r.user = user_repo.NewUser(r.db)
 	}
@@ -35,7 +36,7 @@ func (r *Repository) UserRepoInit() user_repo.Userer {
 	return r.user
 }
 
-func (r *Repository) PostRepoInit() post_repo.Poster {
+func (r *repository) PostRepoInit() post_repo.Poster {
 	if r.post == nil {
 		r.post = post_repo.NewPost(r.db)
 	}
@@ -43,7 +44,7 @@ func (r *Repository) PostRepoInit() post_repo.Poster {
 	return r.post
 }
 
-func (r *Repository) CommentRepoInit() comment_repo.Commenter {
+func (r *repository) CommentRepoInit() comment_repo.Commenter {
 	if r.comment == nil {
 		r.comment = comment_repo.NewComment(r.db)
 	}

@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 	"forum/internal/config"
-	"forum/internal/http/v1"
+	v1 "forum/internal/http/v1"
 	"forum/internal/middleware"
 	"forum/internal/repository"
 	"forum/internal/server"

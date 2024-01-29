@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Controllerer interface {
+type Controller interface {
 	InitRoutes() *gin.Engine
 	StartRoutes()
 
@@ -20,7 +20,7 @@ type Controllerer interface {
 }
 
 type controller struct {
-	service service.Servicer
+	service service.ServiceInitializer
 	router  *gin.Engine
 	middle  middleware.Middlewarer
 
@@ -29,7 +29,7 @@ type controller struct {
 	commentCtrl comment_ctrl.Commenter
 }
 
-func NewController(service service.Servicer, middle middleware.Middlewarer) Controllerer {
+func NewController(service service.ServiceInitializer, middle middleware.Middlewarer) Controller {
 	return &controller{
 		service: service,
 		router:  gin.New(),

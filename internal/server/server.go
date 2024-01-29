@@ -8,13 +8,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Server struct {
+type Server interface {
+	Run()
+	Shutdown(ctx context.Context) error
+	Notify() <-chan error
+}
+
+type server struct {
 	server          *http.Server
 	ServerErrorChan chan error
 }
 
-func NewServer(cfg *config.Configuration, router *gin.Engine) *Server {
-	return &Server{
+func NewServer(cfg *config.Configuration, router *gin.Engine) Server {
+	return &server{
 		server: &http.Server{
 			Addr:           cfg.API.Addr,
 			Handler:        router,
@@ -27,14 +33,14 @@ func NewServer(cfg *config.Configuration, router *gin.Engine) *Server {
 	}
 }
 
-func (s *Server) Run() {
+func (s *server) Run() {
 	s.ServerErrorChan <- s.server.ListenAndServe()
 }
 
-func (s *Server) Shutdown(ctx context.Context) error {
+func (s *server) Shutdown(ctx context.Context) error {
 	return s.server.Shutdown(ctx)
 }
 
-func (s *Server) Notify() <-chan error {
+func (s *server) Notify() <-chan error {
 	return s.ServerErrorChan
 }
